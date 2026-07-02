@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { HERO_IMAGE, PRODUCTS } from "@/lib/products";
@@ -34,9 +35,12 @@ export function Hero() {
             từ ý tưởng, phối màu đến sản phẩm hoàn thiện, tất cả tại Việt Nam.
           </p>
           <div className="flex flex-wrap items-center gap-4">
-            <Button size="lg" className="bg-background text-foreground hover:bg-surface px-10">
+            <Link
+              href="/catalogue"
+              className="inline-flex h-14 items-center justify-center rounded-card bg-background px-9 text-sm font-medium uppercase tracking-label text-foreground transition-colors duration-200 hover:bg-surface"
+            >
               Xem catalogue
-            </Button>
+            </Link>
             <Button
               variant="outline"
               size="lg"

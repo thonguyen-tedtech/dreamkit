@@ -75,3 +75,19 @@ export interface FeaturedStory {
   readonly image: string;
   readonly palette: readonly { readonly label: string; readonly hex: string }[];
 }
+
+/** A single design preview inside a catalogue collection gallery. */
+export interface CatalogueItem {
+  readonly id: string;
+  readonly image: string;
+  readonly alt: string;
+  /** Dominant kit colours used by the colour filter (OR semantics). */
+  readonly colors: readonly ColorKey[];
+}
+
+/** Named product collection shown on the /catalogue page. */
+export interface CatalogueCollection {
+  readonly id: string;
+  readonly title: string;
+  readonly items: readonly CatalogueItem[];
+}
