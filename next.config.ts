@@ -28,15 +28,11 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    // GitHub Pages has no image optimization server, so serve images as-is.
-    unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "dreamkit.vn",
-        pathname: "/wp-content/uploads/**",
-      },
-    ],
+    // Custom loader maps each requested width to the nearest pre-generated
+    // file in public/images; it needs no live optimizer, so it works the same
+    // whether this builds as a static export or a standalone server.
+    loader: "custom",
+    loaderFile: "./lib/image-loader.ts",
   },
 };
 
