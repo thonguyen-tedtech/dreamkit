@@ -1,16 +1,20 @@
 import type { CatalogueCollection, ColorKey } from "./types";
 
-const UPLOADS = "https://dreamkit.vn/wp-content/uploads/2026/05";
+const CATALOGUE_IMAGES = "/images/catalogue";
 
 function item(
   id: string,
   filename: string,
   alt: string,
   colors: readonly ColorKey[],
+  /** Largest resolution available for this file: full original, or a 2048px export. */
+  fullVariant: "original" | "2048" = "original",
 ) {
+  const fullSuffix = fullVariant === "2048" ? "-2048x2048" : "";
   return {
     id,
-    image: `${UPLOADS}/${filename}-400x400.jpg`,
+    image: `${CATALOGUE_IMAGES}/${filename}-400x400.jpg`,
+    fullImage: `${CATALOGUE_IMAGES}/${filename}${fullSuffix}.jpg`,
     alt,
     colors,
   };
@@ -22,22 +26,22 @@ export const CATALOGUE_COLLECTIONS: readonly CatalogueCollection[] = [
     id: "than-ma",
     title: "BỘ SƯU TẬP THẦN MÃ (THÁNH GIÓNG)",
     items: [
-      item("than-ma-1", "H1", "Thiết kế Thần Mã 1", ["white"]),
-      item("than-ma-2", "H2", "Thiết kế Thần Mã 2", ["black"]),
-      item("than-ma-3", "H3", "Thiết kế Thần Mã 3", ["red"]),
-      item("than-ma-4", "H4", "Thiết kế Thần Mã 4", ["yellow"]),
-      item("than-ma-5", "H5", "Thiết kế Thần Mã 5", ["blue"]),
+      item("than-ma-1", "H1", "Thiết kế Thần Mã 1", ["white"], "2048"),
+      item("than-ma-2", "H2", "Thiết kế Thần Mã 2", ["black"], "2048"),
+      item("than-ma-3", "H3", "Thiết kế Thần Mã 3", ["red"], "2048"),
+      item("than-ma-4", "H4", "Thiết kế Thần Mã 4", ["yellow"], "2048"),
+      item("than-ma-5", "H5", "Thiết kế Thần Mã 5", ["blue"], "2048"),
     ],
   },
   {
     id: "goat",
     title: "BỘ SƯU TẬP G.O.A.T",
     items: [
-      item("goat-1", "GOAT1", "Thiết kế G.O.A.T 1", ["blue"]),
-      item("goat-2", "GOAT2", "Thiết kế G.O.A.T 2", ["yellow"]),
-      item("goat-3", "GOAT3", "Thiết kế G.O.A.T 3", ["blue"]),
-      item("goat-4", "GOAT4", "Thiết kế G.O.A.T 4", ["black"]),
-      item("goat-5", "GOAT5", "Thiết kế G.O.A.T 5", ["red"]),
+      item("goat-1", "GOAT1", "Thiết kế G.O.A.T 1", ["blue"], "2048"),
+      item("goat-2", "GOAT2", "Thiết kế G.O.A.T 2", ["yellow"], "2048"),
+      item("goat-3", "GOAT3", "Thiết kế G.O.A.T 3", ["blue"], "2048"),
+      item("goat-4", "GOAT4", "Thiết kế G.O.A.T 4", ["black"], "2048"),
+      item("goat-5", "GOAT5", "Thiết kế G.O.A.T 5", ["red"], "2048"),
     ],
   },
   {
@@ -80,9 +84,9 @@ export const CATALOGUE_COLLECTIONS: readonly CatalogueCollection[] = [
     id: "tay-son",
     title: "BỘ SƯU TẬP TÂY SƠN",
     items: [
-      item("tay-son-1", "TS1-1", "Thiết kế Tây Sơn 1", ["red", "white"]),
-      item("tay-son-2", "TS2-1", "Thiết kế Tây Sơn 2", ["white", "blue"]),
-      item("tay-son-3", "TS3-1", "Thiết kế Tây Sơn 3", ["black", "orange"]),
+      item("tay-son-1", "TS1-1", "Thiết kế Tây Sơn 1", ["red", "white"], "2048"),
+      item("tay-son-2", "TS2-1", "Thiết kế Tây Sơn 2", ["white", "blue"], "2048"),
+      item("tay-son-3", "TS3-1", "Thiết kế Tây Sơn 3", ["black", "orange"], "2048"),
     ],
   },
   {
@@ -148,18 +152,21 @@ export const CATALOGUE_COLLECTIONS: readonly CatalogueCollection[] = [
         "z7644358597690_60ff983c130ee8d8cc6950ab30dc58f5-1",
         "Thiết kế Nhịp Cầu Nâng 1",
         ["white"],
+        "2048",
       ),
       item(
         "nhip-cau-nang-2",
         "z7644358597690_60ff983c130ee8d8cc6950ab30dc58f52-1",
         "Thiết kế Nhịp Cầu Nâng 2",
         ["orange"],
+        "2048",
       ),
       item(
         "nhip-cau-nang-3",
         "z7644358597690_60ff983c130ee8d8cc6950ab30dc58f55-1",
         "Thiết kế Nhịp Cầu Nâng 3",
         ["black"],
+        "2048",
       ),
     ],
   },

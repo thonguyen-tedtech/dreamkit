@@ -92,6 +92,8 @@ export interface FeaturedStory {
 export interface CatalogueItem {
   readonly id: string;
   readonly image: string;
+  /** Highest-resolution version available, shown in the full-screen viewer. */
+  readonly fullImage: string;
   readonly alt: string;
   /** Dominant kit colours used by the colour filter (OR semantics). */
   readonly colors: readonly ColorKey[];

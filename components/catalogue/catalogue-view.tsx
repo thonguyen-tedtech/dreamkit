@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import { ColorFilter } from "@/components/product/color-filter";
 import { Container } from "@/components/ui/container";
 import { useCatalogueFilter } from "@/hooks/use-catalogue-filter";
@@ -9,6 +10,8 @@ import {
   CATALOGUE_COLLECTIONS,
   getCatalogueFilterColors,
 } from "@/lib/catalogue";
+import type { CatalogueItem } from "@/lib/types";
+import { CatalogueLightbox } from "./catalogue-lightbox";
 import { CollectionSection } from "./collection-section";
 
 const FILTER_COLORS = getCatalogueFilterColors(CATALOGUE_COLLECTIONS);
@@ -21,6 +24,19 @@ export function CatalogueView() {
     clearFilters,
     isFiltering,
   } = useCatalogueFilter(CATALOGUE_COLLECTIONS);
+
+  const [lightboxItemId, setLightboxItemId] = useState<string | null>(null);
+  const visibleItems = useMemo(
+    () => filteredCollections.flatMap((collection) => collection.items),
+    [filteredCollections],
+  );
+  const lightboxIndex = lightboxItemId
+    ? visibleItems.findIndex((entry) => entry.id === lightboxItemId)
+    : -1;
+
+  function handleImageOpen(item: CatalogueItem) {
+    setLightboxItemId(item.id);
+  }
 
   return (
     <div className="flex flex-col gap-16 pb-24">
@@ -46,6 +62,7 @@ export function CatalogueView() {
               key={collection.id}
               collection={collection}
               priorityImages={index === 0}
+              onImageOpen={handleImageOpen}
             />
           ))}
         </Container>
@@ -100,6 +117,15 @@ export function CatalogueView() {
           </div>
         </section>
       </Container>
+
+      {lightboxIndex >= 0 ? (
+        <CatalogueLightbox
+          items={visibleItems}
+          index={lightboxIndex}
+          onClose={() => setLightboxItemId(null)}
+          onNavigate={(nextIndex) => setLightboxItemId(visibleItems[nextIndex].id)}
+        />
+      ) : null}
     </div>
   );
 }
