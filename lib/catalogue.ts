@@ -1,7 +1,10 @@
 import { slugifyProductId } from "./product-admin";
-import type { CatalogueCollection, CatalogueItem, ColorKey, Product } from "./types";
+import type { CatalogueCollection, CatalogueItem, ColorKey, Product, ProductType } from "./types";
 
 const CATALOGUE_IMAGES = "/images/catalogue";
+
+/** Fixed order of the catalogue page's category tabs. */
+export const CATALOGUE_TYPE_TABS: readonly ProductType[] = ["set", "jersey", "polo-shirt"];
 
 function item(
   id: string,
@@ -215,6 +218,8 @@ export function buildCatalogueCollectionsFromProducts(
 ): readonly CatalogueCollection[] {
   const order: string[] = [];
   const imagesByName = new Map<string, Map<string, ColorKey[]>>();
+  /** First product seen for each collection name; supplies the category tab, detail link and video URL. */
+  const representativeByName = new Map<string, Product>();
 
   for (const product of products) {
     const name = product.collectionName?.trim();
@@ -228,6 +233,7 @@ export function buildCatalogueCollectionsFromProducts(
       imageColors = new Map();
       imagesByName.set(name, imageColors);
       order.push(name);
+      representativeByName.set(name, product);
     }
 
     for (const url of images) {
@@ -252,7 +258,15 @@ export function buildCatalogueCollectionsFromProducts(
         colors,
       }),
     );
-    return { id, title: name, items };
+    const representative = representativeByName.get(name)!;
+    return {
+      id,
+      title: name,
+      items,
+      productType: representative.type,
+      productId: representative.id,
+      videoUrl: representative.videoUrl,
+    };
   });
 }
 

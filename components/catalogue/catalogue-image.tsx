@@ -22,7 +22,7 @@ export function CatalogueImage({ item, priority = false, onOpen }: CatalogueImag
         type="button"
         onClick={() => onOpen?.(item)}
         aria-label={`Xem toàn màn hình: ${item.alt}`}
-        className="absolute inset-0 cursor-zoom-in"
+        className="absolute inset-0 cursor-zoom-in hover:cursor-pointer"
       >
         <span className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">

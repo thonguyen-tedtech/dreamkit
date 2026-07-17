@@ -18,7 +18,7 @@ import {
 } from "@/lib/products-api";
 import { uploadImageApi } from "@/lib/uploads-api";
 import { formatPrice } from "@/lib/products";
-import type { CollarType, ColorKey, Product, ProductType } from "@/lib/types";
+import type { ColorKey, Product, ProductType } from "@/lib/types";
 import { cn } from "@/lib/cn";
 
 const EMPTY_PRODUCT: Product = {
@@ -30,16 +30,15 @@ const EMPTY_PRODUCT: Product = {
   primaryColor: "black",
   image: "",
   images: [],
-  collar: "regular",
   type: "set",
   isNew: false,
   stock: 0,
   collectionName: "",
   collectionImages: [],
+  videoUrl: "",
 };
 
 const COLOR_OPTIONS = Object.keys(COLOR_META) as ColorKey[];
-const COLLAR_OPTIONS: CollarType[] = ["regular", "polo"];
 const TYPE_OPTIONS: ProductType[] = ["set", "jersey", "polo-shirt"];
 
 function toInput(product: Product): ProductInput {
@@ -57,12 +56,12 @@ function toInput(product: Product): ProductInput {
     primaryColor: product.primaryColor,
     image: images[0]?.url ?? product.image,
     images,
-    collar: product.collar,
     type: product.type,
     isNew: product.isNew,
     stock: product.stock,
     collectionName: product.collectionName,
     collectionImages: product.collectionImages,
+    videoUrl: product.videoUrl,
   };
 }
 
@@ -321,7 +320,7 @@ export function ProductManager() {
                           <button
                             type="button"
                             onClick={() => startEdit(product)}
-                            className="text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:underline"
+                            className="text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:cursor-pointer hover:underline"
                           >
                             Sửa
                           </button>
@@ -329,7 +328,7 @@ export function ProductManager() {
                             type="button"
                             disabled={isPending}
                             onClick={() => void handleDelete(product)}
-                            className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline disabled:opacity-50"
                           >
                             {isPending ? <Spinner className="size-3" /> : null}
                             Xoá
@@ -391,6 +390,15 @@ export function ProductManager() {
                 className={INPUT_CLASS}
               />
             </Field>
+            <Field label="Link video" error={errors.videoUrl}>
+              <input
+                type="url"
+                placeholder="https://www.tiktok.com/@dreamkit/video/..."
+                value={draft.videoUrl ?? ""}
+                onChange={(event) => updateDraft("videoUrl", event.target.value)}
+                className={INPUT_CLASS}
+              />
+            </Field>
             <Field label="Hình ảnh sản phẩm" error={errors.images}>
               <div className="flex flex-col gap-3">
                 {(draft.images ?? []).map((entry, index) => (
@@ -431,7 +439,7 @@ export function ProductManager() {
                         onClick={() => moveImage(index, -1)}
                         disabled={index === 0}
                         aria-label="Đưa lên trước"
-                        className="text-muted hover:text-foreground disabled:opacity-30"
+                        className="text-muted hover:cursor-pointer hover:text-foreground disabled:opacity-30"
                       >
                         ▲
                       </button>
@@ -440,7 +448,7 @@ export function ProductManager() {
                         onClick={() => moveImage(index, 1)}
                         disabled={index === (draft.images?.length ?? 0) - 1}
                         aria-label="Đưa xuống sau"
-                        className="text-muted hover:text-foreground disabled:opacity-30"
+                        className="text-muted hover:cursor-pointer hover:text-foreground disabled:opacity-30"
                       >
                         ▼
                       </button>
@@ -448,7 +456,7 @@ export function ProductManager() {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="shrink-0 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+                      className="shrink-0 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
                     >
                       Xoá
                     </button>
@@ -488,7 +496,7 @@ export function ProductManager() {
                     <button
                       type="button"
                       onClick={() => removeCollectionImage(index)}
-                      className="shrink-0 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+                      className="shrink-0 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
                     >
                       Xoá
                     </button>
@@ -534,7 +542,7 @@ export function ProductManager() {
                       aria-pressed={active}
                       onClick={() => toggleColor(color)}
                       className={cn(
-                        "rounded-card border px-3 py-1.5 text-xs",
+                        "rounded-card border px-3 py-1.5 text-xs hover:cursor-pointer",
                         active
                           ? "border-foreground bg-foreground text-background"
                           : "border-border text-muted",
@@ -546,38 +554,21 @@ export function ProductManager() {
                 })}
               </div>
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Cổ áo" error={errors.collar}>
-                <select
-                  value={draft.collar}
-                  onChange={(event) =>
-                    updateDraft("collar", event.target.value as CollarType)
-                  }
-                  className={INPUT_CLASS}
-                >
-                  {COLLAR_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Loại" error={errors.type}>
-                <select
-                  value={draft.type}
-                  onChange={(event) =>
-                    updateDraft("type", event.target.value as ProductType)
-                  }
-                  className={INPUT_CLASS}
-                >
-                  {TYPE_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-            </div>
+            <Field label="Loại" error={errors.type}>
+              <select
+                value={draft.type}
+                onChange={(event) =>
+                  updateDraft("type", event.target.value as ProductType)
+                }
+                className={INPUT_CLASS}
+              >
+                {TYPE_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </Field>
             <label className="flex items-center gap-2 text-sm text-foreground">
               <input
                 type="checkbox"

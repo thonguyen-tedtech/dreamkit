@@ -124,7 +124,7 @@ export function OrderManager() {
                 <button
                   type="button"
                   onClick={() => handleDelete(order.id)}
-                  className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+                  className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
                 >
                   Xoá đơn
                 </button>

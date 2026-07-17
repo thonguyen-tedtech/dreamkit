@@ -16,7 +16,6 @@ const BASE: Product = {
   primaryColor: "red",
   image: "https://example.com/a.jpg",
   images: [{ url: "https://example.com/a.jpg", color: "red", position: 0 }],
-  collar: "regular",
   type: "set",
   isNew: true,
 };

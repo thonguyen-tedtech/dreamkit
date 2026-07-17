@@ -9,14 +9,7 @@ import {
   sortProducts,
   type SortKey,
 } from "@/lib/catalog";
-import type {
-  CollarType,
-  ColorKey,
-  Product,
-  ProductType,
-} from "@/lib/types";
-
-type FacetValue = ColorKey | CollarType | ProductType;
+import type { ColorKey, Product } from "@/lib/types";
 
 export interface UseCatalogResult {
   readonly pageItems: readonly Product[];
@@ -28,22 +21,15 @@ export interface UseCatalogResult {
   readonly rangeEnd: number;
   readonly sort: SortKey;
   readonly activeColors: ReadonlySet<ColorKey>;
-  readonly activeCollars: ReadonlySet<CollarType>;
-  readonly activeTypes: ReadonlySet<ProductType>;
   readonly hasActiveFilters: boolean;
   readonly setSort: (sort: SortKey) => void;
   readonly setPage: (page: number) => void;
   readonly setPageSize: (pageSize: number) => void;
   readonly toggleColor: (color: ColorKey) => void;
-  readonly toggleCollar: (collar: CollarType) => void;
-  readonly toggleType: (type: ProductType) => void;
   readonly clearFilters: () => void;
 }
 
-function toggleInSet<T extends FacetValue>(
-  set: ReadonlySet<T>,
-  value: T,
-): Set<T> {
+function toggleInSet(set: ReadonlySet<ColorKey>, value: ColorKey): Set<ColorKey> {
   const next = new Set(set);
   if (next.has(value)) {
     next.delete(value);
@@ -64,24 +50,13 @@ export function useCatalog(products: readonly Product[]): UseCatalogResult {
   const [activeColors, setActiveColors] = useState<ReadonlySet<ColorKey>>(
     () => new Set(),
   );
-  const [activeCollars, setActiveCollars] = useState<ReadonlySet<CollarType>>(
-    () => new Set(),
-  );
-  const [activeTypes, setActiveTypes] = useState<ReadonlySet<ProductType>>(
-    () => new Set(),
-  );
   const [sort, setSortState] = useState<SortKey>("popularity");
   const [page, setPageState] = useState(1);
   const [pageSize, setPageSizeState] = useState<number>(PAGE_SIZE);
 
   const filtered = useMemo(
-    () =>
-      filterProducts(products, {
-        colors: activeColors,
-        collars: activeCollars,
-        types: activeTypes,
-      }),
-    [products, activeColors, activeCollars, activeTypes],
+    () => filterProducts(products, { colors: activeColors }),
+    [products, activeColors],
   );
 
   const sorted = useMemo(() => sortProducts(filtered, sort), [filtered, sort]);
@@ -108,26 +83,15 @@ export function useCatalog(products: readonly Product[]): UseCatalogResult {
     setActiveColors((current) => toggleInSet(current, color));
     setPageState(1);
   }, []);
-  const toggleCollar = useCallback((collar: CollarType) => {
-    setActiveCollars((current) => toggleInSet(current, collar));
-    setPageState(1);
-  }, []);
-  const toggleType = useCallback((type: ProductType) => {
-    setActiveTypes((current) => toggleInSet(current, type));
-    setPageState(1);
-  }, []);
 
   const clearFilters = useCallback(() => {
     setActiveColors(new Set());
-    setActiveCollars(new Set());
-    setActiveTypes(new Set());
     setPageState(1);
   }, []);
 
   const rangeStart = totalCount === 0 ? 0 : (safePage - 1) * pageSize + 1;
   const rangeEnd = Math.min(safePage * pageSize, totalCount);
-  const hasActiveFilters =
-    activeColors.size > 0 || activeCollars.size > 0 || activeTypes.size > 0;
+  const hasActiveFilters = activeColors.size > 0;
 
   return {
     pageItems,
@@ -139,15 +103,11 @@ export function useCatalog(products: readonly Product[]): UseCatalogResult {
     rangeEnd,
     sort,
     activeColors,
-    activeCollars,
-    activeTypes,
     hasActiveFilters,
     setSort,
     setPage,
     setPageSize,
     toggleColor,
-    toggleCollar,
-    toggleType,
     clearFilters,
   };
 }

@@ -57,7 +57,7 @@ export function AuthModal() {
               aria-selected={isActive}
               onClick={() => setMode(tab.mode)}
               className={cn(
-                "rounded-card py-2.5 text-xs font-medium uppercase tracking-label transition-colors",
+                "rounded-card py-2.5 text-xs font-medium uppercase tracking-label transition-colors hover:cursor-pointer",
                 isActive
                   ? "bg-accent text-accent-foreground"
                   : "text-muted hover:text-foreground",
@@ -80,7 +80,7 @@ export function AuthModal() {
         <button
           type="button"
           onClick={() => setMode(isLogin ? "register" : "login")}
-          className="font-medium text-foreground underline underline-offset-4"
+          className="font-medium text-foreground underline underline-offset-4 hover:cursor-pointer"
         >
           {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
         </button>

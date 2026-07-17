@@ -41,7 +41,7 @@ export function ColorFilter({
               title={COLOR_META[color].label}
               onClick={() => onToggle(color)}
               className={cn(
-                "size-7 rounded-full border-2 transition-transform duration-200 hover:scale-110",
+                "size-7 rounded-full border-2 transition-transform duration-200 hover:scale-110 hover:cursor-pointer",
                 isActive
                   ? "border-foreground ring-2 ring-foreground ring-offset-2 ring-offset-background"
                   : "border-border",
@@ -55,7 +55,7 @@ export function ColorFilter({
         <button
           type="button"
           onClick={onClear}
-          className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+          className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
         >
           Xoá bộ lọc
         </button>

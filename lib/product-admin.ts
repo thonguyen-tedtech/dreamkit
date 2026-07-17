@@ -1,9 +1,4 @@
-import type {
-  CollarType,
-  ColorKey,
-  Product,
-  ProductType,
-} from "./types";
+import type { ColorKey, Product, ProductType } from "./types";
 
 export type ProductField = keyof Product;
 
@@ -22,7 +17,6 @@ const COLOR_KEYS: readonly ColorKey[] = [
   "cream",
 ];
 
-const COLLAR_TYPES: readonly CollarType[] = ["regular", "polo"];
 const PRODUCT_TYPES: readonly ProductType[] = ["set", "jersey", "polo-shirt"];
 
 export function slugifyProductId(name: string): string {
@@ -54,7 +48,6 @@ export function parseProducts(value: unknown): readonly Product[] {
       Array.isArray(product.colors) &&
       typeof product.primaryColor === "string" &&
       typeof product.image === "string" &&
-      typeof product.collar === "string" &&
       typeof product.type === "string" &&
       typeof product.isNew === "boolean"
     );
@@ -94,10 +87,6 @@ export function validateProduct(product: Product): ProductFieldErrors {
     errors.primaryColor = "Màu chính không hợp lệ";
   }
 
-  if (!COLLAR_TYPES.includes(product.collar)) {
-    errors.collar = "Cổ áo không hợp lệ";
-  }
-
   if (!PRODUCT_TYPES.includes(product.type)) {
     errors.type = "Loại sản phẩm không hợp lệ";
   }
@@ -107,6 +96,13 @@ export function validateProduct(product: Product): ProductFieldErrors {
     (!Number.isFinite(product.stock) || product.stock < 0)
   ) {
     errors.stock = "Tồn kho phải là số không âm";
+  }
+
+  if (
+    product.videoUrl?.trim() &&
+    !/^https?:\/\//.test(product.videoUrl.trim())
+  ) {
+    errors.videoUrl = "Link video phải bắt đầu bằng http:// hoặc https://";
   }
 
   return errors;

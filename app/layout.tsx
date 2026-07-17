@@ -4,6 +4,7 @@ import { AuthModalProvider } from "@/components/auth/auth-modal-provider";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { StoreProvider } from "@/components/store/store-provider";
 import { ToastProvider } from "@/components/ui/toast-provider";
+import { FloatContact } from "@/components/contact/float-contact";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,7 +43,10 @@ export default function RootLayout({
         <ToastProvider>
           <AuthModalProvider>
             <StoreProvider>
-              <CartProvider>{children}</CartProvider>
+              <CartProvider>
+                {children}
+                <FloatContact />
+              </CartProvider>
             </StoreProvider>
           </AuthModalProvider>
         </ToastProvider>

@@ -59,7 +59,7 @@ export function ShopSection() {
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4"
+              className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4 hover:cursor-pointer"
             >
               Xoá bộ lọc
             </button>

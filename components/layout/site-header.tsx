@@ -16,9 +16,7 @@ const NAV_LINKS: readonly NavLink[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Cửa hàng", href: "/shop" },
   { label: "Catalogue", href: "/catalogue" },
-  { label: "Hành trình", href: "/#journey" },
-  { label: "FAQs", href: "/faqs" },
-  { label: "Tra cứu đơn hàng", href: "/track-order" },
+  { label: "Portfolio", href: "/portfolio" },
 ];
 
 export function SiteHeader() {
@@ -62,7 +60,7 @@ export function SiteHeader() {
           <button
             type="button"
             aria-label="Tìm kiếm"
-            className="text-foreground/80 transition-colors hover:text-foreground"
+            className="text-foreground/80 transition-colors hover:cursor-pointer hover:text-foreground"
           >
             <SearchIcon />
           </button>
@@ -91,7 +89,7 @@ export function SiteHeader() {
             <button
               type="button"
               onClick={() => openAuth("login")}
-              className="hidden rounded-card border border-foreground px-4 py-2 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:bg-foreground hover:text-background md:inline-flex"
+              className="hidden rounded-card border border-foreground px-4 py-2 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:cursor-pointer hover:bg-foreground hover:text-background md:inline-flex"
             >
               Đăng nhập
             </button>
@@ -102,7 +100,7 @@ export function SiteHeader() {
             aria-expanded={isMenuOpen}
             aria-controls="mobile-nav"
             onClick={() => setIsMenuOpen((open) => !open)}
-            className="text-foreground md:hidden"
+            className="text-foreground hover:cursor-pointer md:hidden"
           >
             {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
           </button>
@@ -138,7 +136,7 @@ export function SiteHeader() {
                   setIsMenuOpen(false);
                   openAuth("login");
                 }}
-                className="block w-full py-2 text-left text-sm font-medium uppercase tracking-label text-foreground/80 hover:text-foreground"
+                className="block w-full py-2 text-left text-sm font-medium uppercase tracking-label text-foreground/80 hover:cursor-pointer hover:text-foreground"
               >
                 Đăng nhập / Đăng ký
               </button>

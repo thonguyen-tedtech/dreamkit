@@ -16,9 +16,6 @@ export type ColorKey =
   | "gray"
   | "cream";
 
-/** Collar style facet ("Cổ áo"). */
-export type CollarType = "regular" | "polo";
-
 /** Product type facet ("Loại"). */
 export type ProductType = "set" | "jersey" | "polo-shirt";
 
@@ -50,7 +47,6 @@ export interface Product {
   readonly image: string;
   /** Gallery of product photos; images[0] is the cover shown as `image`. */
   readonly images?: readonly ProductImage[];
-  readonly collar: CollarType;
   readonly type: ProductType;
   readonly isNew: boolean;
   /** Units currently in stock. */
@@ -59,6 +55,8 @@ export interface Product {
   readonly collectionName?: string;
   /** Gallery photos showcasing the collection this product belongs to. */
   readonly collectionImages?: readonly string[];
+  /** Video URL (e.g. TikTok) showcasing this product, if any. */
+  readonly videoUrl?: string;
 }
 
 export interface Testimonial {
@@ -108,6 +106,12 @@ export interface CatalogueCollection {
   readonly id: string;
   readonly title: string;
   readonly items: readonly CatalogueItem[];
+  /** Product type of the collection's representative product, used by the category tabs. */
+  readonly productType?: ProductType;
+  /** Id of the collection's representative product, linked from the "detail" button. */
+  readonly productId?: string;
+  /** Video URL for the collection's representative product, if any. */
+  readonly videoUrl?: string;
 }
 
 /** Lifecycle status for a customer order (mirrors the backend's OrderStatus enum). */

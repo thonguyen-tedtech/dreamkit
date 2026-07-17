@@ -19,7 +19,6 @@ function product(id: string, price: number): Product {
     colors: ["red"],
     primaryColor: "red",
     image: `${id}.jpg`,
-    collar: "regular",
     type: "set",
     isNew: false,
   };

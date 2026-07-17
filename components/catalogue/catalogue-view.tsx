@@ -14,6 +14,7 @@ import {
 } from "@/lib/catalogue";
 import type { CatalogueItem } from "@/lib/types";
 import { CatalogueLightbox } from "./catalogue-lightbox";
+import { CategoryTabs } from "./category-tabs";
 import { CollectionSection } from "./collection-section";
 
 export function CatalogueView() {
@@ -22,18 +23,22 @@ export function CatalogueView() {
     () => buildCatalogueCollectionsFromProducts(products),
     [products],
   );
-  const filterColors = useMemo(
-    () => getCatalogueFilterColors(collections),
-    [collections],
-  );
 
   const {
     activeColors,
+    activeType,
+    typeFilteredCollections,
     filteredCollections,
     toggleColor,
+    setActiveType,
     clearFilters,
     isFiltering,
   } = useCatalogueFilter(collections);
+
+  const filterColors = useMemo(
+    () => getCatalogueFilterColors(typeFilteredCollections),
+    [typeFilteredCollections],
+  );
 
   const [lightboxItemId, setLightboxItemId] = useState<string | null>(null);
   const visibleItems = useMemo(
@@ -50,19 +55,23 @@ export function CatalogueView() {
 
   return (
     <div className="flex flex-col gap-16 pb-24">
-      <Container className="flex flex-col gap-6 border-b border-border pb-8 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-muted">
-          {isFiltering
-            ? `Đang hiển thị ${filteredCollections.length} bộ sưu tập phù hợp`
-            : `${collections.length} bộ sưu tập thiết kế áo đấu`}
-        </p>
-        <ColorFilter
-          colors={filterColors}
-          activeColors={activeColors}
-          onToggle={toggleColor}
-          onClear={clearFilters}
-          isFiltering={isFiltering}
-        />
+      <Container className="flex flex-col gap-6 border-b border-border pb-8">
+        <CategoryTabs activeType={activeType} onSelect={setActiveType} />
+
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted">
+            {isFiltering
+              ? `Đang hiển thị ${filteredCollections.length} bộ sưu tập phù hợp`
+              : `${typeFilteredCollections.length} bộ sưu tập thiết kế áo đấu`}
+          </p>
+          <ColorFilter
+            colors={filterColors}
+            activeColors={activeColors}
+            onToggle={toggleColor}
+            onClear={clearFilters}
+            isFiltering={isFiltering}
+          />
+        </div>
       </Container>
 
       {!isHydrated && collections.length === 0 ? (
@@ -89,18 +98,22 @@ export function CatalogueView() {
             <p className="font-display text-2xl text-foreground">
               {collections.length === 0
                 ? "Chưa có bộ sưu tập nào"
-                : "Không có thiết kế phù hợp"}
+                : typeFilteredCollections.length === 0
+                  ? "Không có bộ sưu tập trong danh mục này"
+                  : "Không có thiết kế phù hợp"}
             </p>
             <p className="text-sm text-muted">
               {collections.length === 0
                 ? "Bộ sưu tập sẽ xuất hiện khi sản phẩm được gắn tên và ảnh bộ sưu tập."
-                : "Thử bỏ bớt bộ lọc màu để xem thêm bộ sưu tập."}
+                : typeFilteredCollections.length === 0
+                  ? "Thử chọn danh mục khác ở trên."
+                  : "Thử bỏ bớt bộ lọc màu để xem thêm bộ sưu tập."}
             </p>
             {isFiltering ? (
               <button
                 type="button"
                 onClick={clearFilters}
-                className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4"
+                className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4 hover:cursor-pointer"
               >
                 Xoá bộ lọc
               </button>

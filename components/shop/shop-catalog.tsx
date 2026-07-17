@@ -34,11 +34,7 @@ export function ShopCatalog() {
     <ShopFilters
       products={products}
       activeColors={catalog.activeColors}
-      activeCollars={catalog.activeCollars}
-      activeTypes={catalog.activeTypes}
       onToggleColor={catalog.toggleColor}
-      onToggleCollar={catalog.toggleCollar}
-      onToggleType={catalog.toggleType}
       onClear={catalog.clearFilters}
       hasActiveFilters={catalog.hasActiveFilters}
     />
@@ -88,7 +84,7 @@ export function ShopCatalog() {
             <button
               type="button"
               onClick={catalog.clearFilters}
-              className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4"
+              className="mt-2 text-xs font-medium uppercase tracking-label text-foreground underline underline-offset-4 hover:cursor-pointer"
             >
               Xoá bộ lọc
             </button>

@@ -364,7 +364,7 @@ export function DiscountCodeManager() {
                             <button
                               type="button"
                               onClick={() => startEdit(discountCode)}
-                              className="text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:underline"
+                              className="text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:cursor-pointer hover:underline"
                             >
                               Sửa
                             </button>
@@ -372,7 +372,7 @@ export function DiscountCodeManager() {
                               type="button"
                               disabled={isPending}
                               onClick={() => void handleToggleActive(discountCode)}
-                              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline disabled:opacity-50"
                             >
                               {isPending ? <Spinner className="size-3" /> : null}
                               {discountCode.isActive ? "Tắt" : "Bật"}
@@ -381,7 +381,7 @@ export function DiscountCodeManager() {
                               type="button"
                               disabled={isPending}
                               onClick={() => void handleDelete(discountCode)}
-                              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
+                              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline disabled:opacity-50"
                             >
                               {isPending ? <Spinner className="size-3" /> : null}
                               Xoá

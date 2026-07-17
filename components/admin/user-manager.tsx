@@ -154,7 +154,7 @@ export function UserManager() {
                           type="button"
                           disabled={isPending || isSelf}
                           onClick={() => void handleDelete(user.id)}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline disabled:opacity-50"
                         >
                           {isPending ? <Spinner className="size-3" /> : null}
                           Xoá

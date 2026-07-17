@@ -47,7 +47,7 @@ export function FaqAccordion({ items, defaultOpenIds }: FaqAccordionProps) {
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
-                className="flex w-full items-center justify-between gap-6 py-6 text-left"
+                className="flex w-full items-center justify-between gap-6 py-6 text-left hover:cursor-pointer"
               >
                 <span className="font-display text-lg text-foreground sm:text-xl">
                   {item.question}

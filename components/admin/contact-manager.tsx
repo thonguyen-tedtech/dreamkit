@@ -129,7 +129,7 @@ export function ContactManager() {
                         type="button"
                         disabled={isPending}
                         onClick={() => void handleMarkAsRead(contact.id)}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:underline disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-label text-foreground underline-offset-4 hover:cursor-pointer hover:underline disabled:opacity-50"
                       >
                         {isPending ? <Spinner className="size-3" /> : null}
                         Đánh dấu đã đọc

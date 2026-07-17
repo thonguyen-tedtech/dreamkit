@@ -1,5 +1,5 @@
 import { apiFetch } from "./api-client";
-import type { CollarType, ColorKey, Product, ProductImage, ProductType } from "./types";
+import type { ColorKey, Product, ProductImage, ProductType } from "./types";
 
 const UPLOADS_ORIGIN =
   process.env.NEXT_PUBLIC_UPLOADS_URL ?? "https://dreamkit.tedtech.asia";
@@ -17,7 +17,6 @@ const COLOR_KEYS = new Set<ColorKey>([
   "cream",
 ]);
 
-const COLLAR_TYPES = new Set<CollarType>(["regular", "polo"]);
 const PRODUCT_TYPES = new Set<ProductType>(["set", "jersey", "polo-shirt"]);
 
 /** Product image shape returned by the NestJS products API. */
@@ -38,12 +37,12 @@ export interface ApiProduct {
   readonly primaryColor: string;
   readonly image: string;
   readonly images?: readonly ApiProductImage[];
-  readonly collar: string;
   readonly type: string;
   readonly isNew: boolean;
   readonly stock?: number;
   readonly collectionName?: string;
   readonly collectionImages?: readonly string[];
+  readonly videoUrl?: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
   readonly __v?: number;
@@ -97,10 +96,6 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product | null {
     return null;
   }
 
-  if (!COLLAR_TYPES.has(apiProduct.collar as CollarType)) {
-    return null;
-  }
-
   if (!PRODUCT_TYPES.has(apiProduct.type as ProductType)) {
     return null;
   }
@@ -127,12 +122,12 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product | null {
       images.length > 0
         ? images
         : [{ url: resolveProductImage(apiProduct.image), color: apiProduct.primaryColor, position: 0 }],
-    collar: apiProduct.collar as CollarType,
     type: apiProduct.type as ProductType,
     isNew: apiProduct.isNew,
     stock: apiProduct.stock,
     collectionName: apiProduct.collectionName,
     collectionImages: apiProduct.collectionImages?.map(resolveProductImage),
+    videoUrl: apiProduct.videoUrl,
   };
 }
 

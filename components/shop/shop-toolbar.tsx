@@ -34,7 +34,7 @@ export function ShopToolbar({
         <button
           type="button"
           onClick={onOpenFilters}
-          className="inline-flex items-center gap-2 rounded-card border border-border px-4 py-2 text-xs font-medium uppercase tracking-label text-foreground lg:hidden"
+          className="inline-flex items-center gap-2 rounded-card border border-border px-4 py-2 text-xs font-medium uppercase tracking-label text-foreground hover:cursor-pointer lg:hidden"
         >
           Lọc
         </button>

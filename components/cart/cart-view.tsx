@@ -148,7 +148,7 @@ export function CartView() {
           <button
             type="button"
             onClick={clear}
-            className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+            className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
           >
             Xoá giỏ hàng
           </button>
@@ -185,7 +185,7 @@ export function CartView() {
               <button
                 type="button"
                 onClick={handleRemoveDiscount}
-                className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+                className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
               >
                 Xoá mã
               </button>
@@ -267,7 +267,7 @@ function CartRow({ line, onRemove, onQuantityChange }: CartRowProps) {
             type="button"
             onClick={onRemove}
             aria-label={`Xoá ${product.name}`}
-            className="shrink-0 text-muted transition-colors hover:text-foreground"
+            className="shrink-0 text-muted transition-colors hover:cursor-pointer hover:text-foreground"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -299,14 +299,14 @@ interface QuantityStepperProps {
   onChange: (quantity: number) => void;
 }
 
-function QuantityStepper({ quantity, onChange }: QuantityStepperProps) {
+export function QuantityStepper({ quantity, onChange }: QuantityStepperProps) {
   return (
     <div className="inline-flex items-center rounded-card border border-border">
       <button
         type="button"
         onClick={() => onChange(quantity - 1)}
         aria-label="Giảm số lượng"
-        className="flex size-9 items-center justify-center text-foreground hover:bg-surface-strong"
+        className="flex size-9 items-center justify-center text-foreground hover:cursor-pointer hover:bg-surface-strong"
       >
         −
       </button>
@@ -317,7 +317,7 @@ function QuantityStepper({ quantity, onChange }: QuantityStepperProps) {
         type="button"
         onClick={() => onChange(quantity + 1)}
         aria-label="Tăng số lượng"
-        className="flex size-9 items-center justify-center text-foreground hover:bg-surface-strong"
+        className="flex size-9 items-center justify-center text-foreground hover:cursor-pointer hover:bg-surface-strong"
       >
         +
       </button>

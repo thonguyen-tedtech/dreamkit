@@ -78,7 +78,7 @@ export function CatalogueLightbox({
         type="button"
         onClick={onClose}
         aria-label="Đóng"
-        className="absolute right-5 top-5 z-10 text-foreground/70 transition-colors hover:text-foreground"
+        className="absolute right-5 top-5 z-10 text-foreground/70 transition-colors hover:cursor-pointer hover:text-foreground"
       >
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path
@@ -96,7 +96,7 @@ export function CatalogueLightbox({
             type="button"
             onClick={() => onNavigate((index - 1 + items.length) % items.length)}
             aria-label="Ảnh trước"
-            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-foreground/70 transition-colors hover:text-foreground sm:left-6"
+            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 text-foreground/70 transition-colors hover:cursor-pointer hover:text-foreground sm:left-6"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -112,7 +112,7 @@ export function CatalogueLightbox({
             type="button"
             onClick={() => onNavigate((index + 1) % items.length)}
             aria-label="Ảnh tiếp theo"
-            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-foreground/70 transition-colors hover:text-foreground sm:right-6"
+            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 text-foreground/70 transition-colors hover:cursor-pointer hover:text-foreground sm:right-6"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path

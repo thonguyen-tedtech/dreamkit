@@ -14,7 +14,6 @@ const API_PRODUCT = {
   colors: ["blue"],
   primaryColor: "blue",
   image: "/uploads/2024/11/gen-h-z7195942007819_db522f4d24bf24bd339b4166925a0983-300x300.jpg",
-  collar: "polo",
   type: "set",
   isNew: false,
 } as const;
@@ -52,7 +51,6 @@ describe("mapApiProductToProduct", () => {
           position: 0,
         },
       ],
-      collar: "polo",
       type: "set",
       isNew: false,
       stock: undefined,

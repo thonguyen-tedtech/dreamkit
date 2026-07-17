@@ -30,6 +30,28 @@
   --spacing-shell: 1.5rem;
 }
 
+/*
+ * Scoped dark theme — inverts the "Atelier" tokens (sand-on-ink instead of
+ * ink-on-sand) for any subtree wrapped in this class. Components never
+ * reference raw colours, only these custom properties via Tailwind's
+ * `bg-background`/`text-foreground`/etc. utilities, so wrapping a section is
+ * enough to re-theme it without touching component code.
+ */
+.theme-dark {
+  --color-background: #14120f;
+  --color-surface: #1f1c17;
+  --color-surface-strong: #2a251e;
+  --color-foreground: #f4f0e6;
+  --color-muted: #a89f90;
+  --color-border: #34302a;
+  --color-accent: #f4f0e6;
+  --color-accent-foreground: #14120f;
+  --color-highlight: #d1a15f;
+
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

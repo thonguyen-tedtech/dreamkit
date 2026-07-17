@@ -68,7 +68,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     type="button"
                     onClick={() => dismiss(toast.id)}
                     aria-label="Đóng thông báo"
-                    className="shrink-0 text-muted transition-colors hover:text-foreground"
+                    className="shrink-0 text-muted transition-colors hover:cursor-pointer hover:text-foreground"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                       <path

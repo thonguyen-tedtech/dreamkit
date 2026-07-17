@@ -1,9 +1,4 @@
-import type {
-  CollarType,
-  ColorKey,
-  Product,
-  ProductType,
-} from "./types";
+import type { ColorKey, Product } from "./types";
 
 /** Sort options offered in the shop toolbar (mirrors the WooCommerce store). */
 export type SortKey =
@@ -15,8 +10,6 @@ export type SortKey =
 
 export interface CatalogFilters {
   readonly colors: ReadonlySet<ColorKey>;
-  readonly collars: ReadonlySet<CollarType>;
-  readonly types: ReadonlySet<ProductType>;
 }
 
 export const PAGE_SIZE = 12;
@@ -32,25 +25,16 @@ export const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
   { value: "price-desc", label: "Giá: cao xuống thấp" },
 ];
 
-/**
- * Filters products against the active facets. Within a facet the match is OR
- * (any selected value), across facets it is AND — the standard e-commerce
- * faceted-search behaviour. An empty facet imposes no constraint.
- */
+/** Filters products by colour (OR match); an empty facet imposes no constraint. */
 export function filterProducts(
   products: readonly Product[],
   filters: CatalogFilters,
 ): readonly Product[] {
-  return products.filter((product) => {
-    const colorMatch =
+  return products.filter(
+    (product) =>
       filters.colors.size === 0 ||
-      product.colors.some((color) => filters.colors.has(color));
-    const collarMatch =
-      filters.collars.size === 0 || filters.collars.has(product.collar);
-    const typeMatch =
-      filters.types.size === 0 || filters.types.has(product.type);
-    return colorMatch && collarMatch && typeMatch;
-  });
+      product.colors.some((color) => filters.colors.has(color)),
+  );
 }
 
 /** Returns a new, sorted array (does not mutate the input). */
@@ -88,18 +72,6 @@ export function pageCount(
   pageSize: number = PAGE_SIZE,
 ): number {
   return Math.max(1, Math.ceil(total / pageSize));
-}
-
-/** Counts how many products carry each value of the given key. */
-export function countBy<K extends keyof Product>(
-  products: readonly Product[],
-  key: K,
-): Map<Product[K], number> {
-  const counts = new Map<Product[K], number>();
-  for (const product of products) {
-    counts.set(product[key], (counts.get(product[key]) ?? 0) + 1);
-  }
-  return counts;
 }
 
 /** Counts products per colour (a product contributes to each of its colours). */

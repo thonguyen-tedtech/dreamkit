@@ -7,7 +7,7 @@ import {
   sortProducts,
   type CatalogFilters,
 } from "./catalog";
-import type { CollarType, ColorKey, Product, ProductType } from "./types";
+import type { ColorKey, Product } from "./types";
 
 function makeProduct(overrides: Partial<Product> & Pick<Product, "id">): Product {
   return {
@@ -17,7 +17,6 @@ function makeProduct(overrides: Partial<Product> & Pick<Product, "id">): Product
     colors: ["red"],
     primaryColor: "red",
     image: "x.jpg",
-    collar: "regular",
     type: "set",
     isNew: false,
     ...overrides,
@@ -25,16 +24,14 @@ function makeProduct(overrides: Partial<Product> & Pick<Product, "id">): Product
 }
 
 const PRODUCTS: readonly Product[] = [
-  makeProduct({ id: "a", price: 300, colors: ["red", "blue"], collar: "polo", type: "jersey" }),
+  makeProduct({ id: "a", price: 300, colors: ["red", "blue"], type: "jersey" }),
   makeProduct({ id: "b", price: 100, colors: ["green"], isNew: true }),
-  makeProduct({ id: "c", price: 200, colors: ["blue"], collar: "polo" }),
+  makeProduct({ id: "c", price: 200, colors: ["blue"] }),
 ];
 
 function filters(partial: Partial<CatalogFilters> = {}): CatalogFilters {
   return {
     colors: new Set<ColorKey>(),
-    collars: new Set<CollarType>(),
-    types: new Set<ProductType>(),
     ...partial,
   };
 }
@@ -49,18 +46,6 @@ describe("filterProducts", () => {
     expect(result.map((p) => p.id)).toEqual(["a", "c"]);
   });
 
-  it("uses AND across facets", () => {
-    const result = filterProducts(
-      PRODUCTS,
-      filters({ colors: new Set(["blue"]), collars: new Set(["polo"]) }),
-    );
-    expect(result.map((p) => p.id)).toEqual(["a", "c"]);
-  });
-
-  it("filters by product type", () => {
-    const result = filterProducts(PRODUCTS, filters({ types: new Set(["jersey"]) }));
-    expect(result.map((p) => p.id)).toEqual(["a"]);
-  });
 });
 
 describe("sortProducts", () => {

@@ -1,30 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { countBy, countColors } from "@/lib/catalog";
+import { countColors } from "@/lib/catalog";
 import { COLOR_META } from "@/lib/products";
-import type { CollarType, ColorKey, Product, ProductType } from "@/lib/types";
-import { FilterGroup, type FilterOption } from "./filter-group";
-
-const COLLAR_LABELS: Record<CollarType, string> = {
-  polo: "Cổ polo",
-  regular: "Cổ thường",
-};
-
-const TYPE_LABELS: Record<ProductType, string> = {
-  jersey: "Áo Jersey",
-  "polo-shirt": "Áo polo",
-  set: "Set quần áo bóng đá",
-};
+import type { ColorKey, Product } from "@/lib/types";
+import { FilterGroup } from "./filter-group";
 
 interface ShopFiltersProps {
   products: readonly Product[];
   activeColors: ReadonlySet<ColorKey>;
-  activeCollars: ReadonlySet<CollarType>;
-  activeTypes: ReadonlySet<ProductType>;
   onToggleColor: (value: ColorKey) => void;
-  onToggleCollar: (value: CollarType) => void;
-  onToggleType: (value: ProductType) => void;
   onClear: () => void;
   hasActiveFilters: boolean;
 }
@@ -32,11 +17,7 @@ interface ShopFiltersProps {
 export function ShopFilters({
   products,
   activeColors,
-  activeCollars,
-  activeTypes,
   onToggleColor,
-  onToggleCollar,
-  onToggleType,
   onClear,
   hasActiveFilters,
 }: ShopFiltersProps) {
@@ -52,27 +33,6 @@ export function ShopFilters({
       }));
   }, [products]);
 
-  const collarOptions = useMemo(() => {
-    const counts = countBy(products, "collar");
-    return (["polo", "regular"] as CollarType[])
-      .filter((value) => (counts.get(value) ?? 0) > 0)
-      .map((value) => ({
-        value,
-        label: COLLAR_LABELS[value],
-        count: counts.get(value) ?? 0,
-      }));
-  }, [products]);
-
-  const typeOptions = useMemo(() => {
-    const counts = countBy(products, "type");
-    return (["jersey", "polo-shirt", "set"] as ProductType[])
-      .filter((value) => (counts.get(value) ?? 0) > 0)
-      .map((value) => ({
-        value,
-        label: TYPE_LABELS[value],
-        count: counts.get(value) ?? 0,
-      }));
-  }, [products]);
   return (
     <div className="flex flex-col">
       <div className="flex items-center justify-between border-b border-border pb-4">
@@ -83,7 +43,7 @@ export function ShopFilters({
           <button
             type="button"
             onClick={onClear}
-            className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:text-foreground hover:underline"
+            className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
           >
             Xoá tất cả
           </button>
@@ -95,18 +55,6 @@ export function ShopFilters({
         options={colorOptions}
         selected={activeColors}
         onToggle={onToggleColor}
-      />
-      <FilterGroup
-        title="Cổ áo"
-        options={collarOptions}
-        selected={activeCollars}
-        onToggle={onToggleCollar}
-      />
-      <FilterGroup
-        title="Loại"
-        options={typeOptions}
-        selected={activeTypes}
-        onToggle={onToggleType}
       />
     </div>
   );

@@ -10,7 +10,7 @@ interface ButtonProps extends ComponentPropsWithoutRef<"button"> {
 }
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-card font-medium uppercase tracking-label transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-card font-medium uppercase tracking-label transition-colors duration-200 hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
   solid:

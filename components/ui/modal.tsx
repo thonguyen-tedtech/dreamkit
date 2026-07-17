@@ -119,7 +119,7 @@ export function Modal({
           type="button"
           onClick={onClose}
           aria-label="Đóng"
-          className="absolute right-5 top-5 text-muted transition-colors hover:text-foreground"
+          className="absolute right-5 top-5 text-muted transition-colors hover:cursor-pointer hover:text-foreground"
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
