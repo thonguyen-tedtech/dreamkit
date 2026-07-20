@@ -211,7 +211,7 @@ export const CATALOGUE_COLLECTIONS: readonly CatalogueCollection[] = [
  * into a catalogue gallery. Products with no collection name or no collection
  * images don't contribute a collection. Image URLs shared by several products
  * in the same collection are deduplicated; an item's colours are the union of
- * the colours of every product that supplied that image.
+ * the colour tagged on that image by every product that supplied it.
  */
 export function buildCatalogueCollectionsFromProducts(
   products: readonly Product[],
@@ -238,10 +238,8 @@ export function buildCatalogueCollectionsFromProducts(
 
     for (const entry of images) {
       const colors = imageColors.get(entry.url) ?? [];
-      for (const color of product.colors) {
-        if (!colors.includes(color)) {
-          colors.push(color);
-        }
+      if (!colors.includes(entry.color)) {
+        colors.push(entry.color);
       }
       imageColors.set(entry.url, colors);
     }
