@@ -17,7 +17,7 @@ const COLOR_KEYS: readonly ColorKey[] = [
   "cream",
 ];
 
-const PRODUCT_TYPES: readonly ProductType[] = ["set", "jersey", "polo-shirt"];
+const PRODUCT_TYPES: readonly ProductType[] = ["set", "jersey", "polo"];
 
 export function slugifyProductId(name: string): string {
   return name

@@ -54,6 +54,7 @@ describe("mapApiProductToProduct", () => {
       type: "set",
       isNew: false,
       stock: undefined,
+      collectionImages: [],
     });
   });
 

@@ -17,7 +17,7 @@ export type ColorKey =
   | "cream";
 
 /** Product type facet ("Loại"). */
-export type ProductType = "set" | "jersey" | "polo-shirt";
+export type ProductType = "set" | "jersey" | "polo";
 
 export interface ColorMeta {
   /** Vietnamese label shown in the UI (matches the original storefront). */
@@ -54,7 +54,7 @@ export interface Product {
   /** Name of the collection this product belongs to, if any. */
   readonly collectionName?: string;
   /** Gallery photos showcasing the collection this product belongs to. */
-  readonly collectionImages?: readonly string[];
+  readonly collectionImages?: readonly ProductImage[];
   /** Video URL (e.g. TikTok) showcasing this product, if any. */
   readonly videoUrl?: string;
 }

@@ -4,7 +4,7 @@ import type { CatalogueCollection, CatalogueItem, ColorKey, Product, ProductType
 const CATALOGUE_IMAGES = "/images/catalogue";
 
 /** Fixed order of the catalogue page's category tabs. */
-export const CATALOGUE_TYPE_TABS: readonly ProductType[] = ["set", "jersey", "polo-shirt"];
+export const CATALOGUE_TYPE_TABS: readonly ProductType[] = ["set", "jersey", "polo"];
 
 function item(
   id: string,
@@ -236,14 +236,14 @@ export function buildCatalogueCollectionsFromProducts(
       representativeByName.set(name, product);
     }
 
-    for (const url of images) {
-      const colors = imageColors.get(url) ?? [];
+    for (const entry of images) {
+      const colors = imageColors.get(entry.url) ?? [];
       for (const color of product.colors) {
         if (!colors.includes(color)) {
           colors.push(color);
         }
       }
-      imageColors.set(url, colors);
+      imageColors.set(entry.url, colors);
     }
   }
 

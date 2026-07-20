@@ -27,7 +27,7 @@ export const COLOR_META: Readonly<Record<ColorKey, ColorMeta>> = {
 /** Product type labels ("Loại" facet). */
 export const TYPE_LABELS: Readonly<Record<ProductType, string>> = {
   jersey: "Áo Jersey",
-  "polo-shirt": "Áo polo",
+  polo: "Áo polo",
   set: "Set quần áo bóng đá",
 };
 
@@ -202,7 +202,7 @@ export const PRODUCTS: readonly Product[] = [
     colors: ["white"],
     primaryColor: "white",
     image: `${UPLOADS}/2025/10/GOAT-HOME-1-GOLD-scaled-300x300.jpg`,
-    type: "polo-shirt",
+    type: "polo",
     isNew: false,
   },
   {

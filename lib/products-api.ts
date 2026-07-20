@@ -17,7 +17,7 @@ const COLOR_KEYS = new Set<ColorKey>([
   "cream",
 ]);
 
-const PRODUCT_TYPES = new Set<ProductType>(["set", "jersey", "polo-shirt"]);
+const PRODUCT_TYPES = new Set<ProductType>(["set", "jersey", "polo"]);
 
 /** Product image shape returned by the NestJS products API. */
 export interface ApiProductImage {
@@ -41,7 +41,7 @@ export interface ApiProduct {
   readonly isNew: boolean;
   readonly stock?: number;
   readonly collectionName?: string;
-  readonly collectionImages?: readonly string[];
+  readonly collectionImages?: readonly ApiProductImage[];
   readonly videoUrl?: string;
   readonly createdAt?: string;
   readonly updatedAt?: string;
@@ -110,6 +110,16 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product | null {
     .slice()
     .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
 
+  const collectionImages: readonly ProductImage[] = (apiProduct.collectionImages ?? [])
+    .filter((entry): entry is ApiProductImage & { color: ColorKey } => isColorKey(entry.color))
+    .map((entry) => ({
+      url: resolveProductImage(entry.url),
+      color: entry.color,
+      position: entry.position,
+    }))
+    .slice()
+    .sort((a, b) => (a.position ?? 0) - (b.position ?? 0));
+
   return {
     id: apiProduct._id,
     name: apiProduct.name,
@@ -126,7 +136,7 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product | null {
     isNew: apiProduct.isNew,
     stock: apiProduct.stock,
     collectionName: apiProduct.collectionName,
-    collectionImages: apiProduct.collectionImages?.map(resolveProductImage),
+    collectionImages,
     videoUrl: apiProduct.videoUrl,
   };
 }

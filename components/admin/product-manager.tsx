@@ -39,10 +39,15 @@ const EMPTY_PRODUCT: Product = {
 };
 
 const COLOR_OPTIONS = Object.keys(COLOR_META) as ColorKey[];
-const TYPE_OPTIONS: ProductType[] = ["set", "jersey", "polo-shirt"];
+const TYPE_OPTIONS: ProductType[] = ["set", "jersey", "polo"];
 
 function toInput(product: Product): ProductInput {
   const images = (product.images ?? []).map((entry, index) => ({
+    url: entry.url,
+    color: entry.color,
+    position: index,
+  }));
+  const collectionImages = (product.collectionImages ?? []).map((entry, index) => ({
     url: entry.url,
     color: entry.color,
     position: index,
@@ -60,7 +65,7 @@ function toInput(product: Product): ProductInput {
     isNew: product.isNew,
     stock: product.stock,
     collectionName: product.collectionName,
-    collectionImages: product.collectionImages,
+    collectionImages,
     videoUrl: product.videoUrl,
   };
 }
@@ -180,8 +185,20 @@ export function ProductManager() {
 
     setDraft((current) => ({
       ...current,
-      collectionImages: [...(current.collectionImages ?? []), result.url],
+      collectionImages: [
+        ...(current.collectionImages ?? []),
+        { url: result.url, color: current.primaryColor },
+      ],
     }));
+  }
+
+  function updateCollectionImageColor(index: number, color: ColorKey) {
+    setDraft((current) => {
+      const collectionImages = (current.collectionImages ?? []).map((entry, i) =>
+        i === index ? { ...entry, color } : entry,
+      );
+      return { ...current, collectionImages };
+    });
   }
 
   function removeCollectionImage(index: number) {
@@ -478,21 +495,33 @@ export function ProductManager() {
             </Field>
             <Field label="Ảnh bộ sưu tập" error={errors.collectionImages}>
               <div className="flex flex-col gap-3">
-                {(draft.collectionImages ?? []).map((url, index) => (
+                {(draft.collectionImages ?? []).map((entry, index) => (
                   <div
-                    key={`${url}-${index}`}
+                    key={`${entry.url}-${index}`}
                     className="flex items-center gap-3 rounded-card border border-border p-3"
                   >
                     <div className="relative size-14 shrink-0 overflow-hidden rounded-card border border-border">
                       <Image
-                        src={resolveProductImage(url)}
+                        src={resolveProductImage(entry.url)}
                         alt=""
                         fill
                         sizes="56px"
                         className="object-cover"
                       />
                     </div>
-                    <span className="flex-1 truncate text-xs text-muted">{url}</span>
+                    <select
+                      value={entry.color}
+                      onChange={(event) =>
+                        updateCollectionImageColor(index, event.target.value as ColorKey)
+                      }
+                      className={cn(INPUT_CLASS, "flex-1")}
+                    >
+                      {COLOR_OPTIONS.map((color) => (
+                        <option key={color} value={color}>
+                          {COLOR_META[color].label}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       type="button"
                       onClick={() => removeCollectionImage(index)}

@@ -3,7 +3,7 @@ import { API_BASE_URL, parseApiError } from "./api-client";
 export interface UploadImageSuccess {
   readonly ok: true;
   readonly url: string;
-  readonly filename: string;
+  readonly key: string;
 }
 
 export interface UploadImageFailure {
@@ -22,7 +22,7 @@ export async function uploadImageApi(
   formData.append("file", file);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/uploads/image`, {
+    const response = await fetch(`${API_BASE_URL}/api/uploads/local-image`, {
       method: "POST",
       headers: { Authorization: `Bearer ${accessToken}` },
       body: formData,
@@ -32,8 +32,8 @@ export async function uploadImageApi(
       return { ok: false, message: await parseApiError(response) };
     }
 
-    const data = (await response.json()) as { url: string; filename: string };
-    return { ok: true, url: data.url, filename: data.filename };
+    const data = (await response.json()) as { url: string; key: string };
+    return { ok: true, url: data.url, key: data.key };
   } catch {
     return {
       ok: false,
