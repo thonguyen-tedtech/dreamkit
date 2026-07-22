@@ -15,6 +15,7 @@ const COLOR_KEYS: readonly ColorKey[] = [
   "yellow",
   "gray",
   "cream",
+  "pink",
 ];
 
 const PRODUCT_TYPES: readonly ProductType[] = ["set", "jersey", "polo"];
@@ -96,6 +97,13 @@ export function validateProduct(product: Product): ProductFieldErrors {
     (!Number.isFinite(product.stock) || product.stock < 0)
   ) {
     errors.stock = "Tồn kho phải là số không âm";
+  }
+
+  if (
+    product.collectionPosition !== undefined &&
+    (!Number.isFinite(product.collectionPosition) || product.collectionPosition < 0)
+  ) {
+    errors.collectionPosition = "Vị trí bộ sưu tập phải là số không âm";
   }
 
   if (

@@ -15,6 +15,7 @@ const COLOR_KEYS = new Set<ColorKey>([
   "yellow",
   "gray",
   "cream",
+  "pink",
 ]);
 
 const PRODUCT_TYPES = new Set<ProductType>(["set", "jersey", "polo"]);
@@ -41,6 +42,7 @@ export interface ApiProduct {
   readonly isNew: boolean;
   readonly stock?: number;
   readonly collectionName?: string;
+  readonly collectionPosition?: number;
   readonly collectionImages?: readonly ApiProductImage[];
   readonly videoUrl?: string;
   readonly createdAt?: string;
@@ -136,6 +138,7 @@ export function mapApiProductToProduct(apiProduct: ApiProduct): Product | null {
     isNew: apiProduct.isNew,
     stock: apiProduct.stock,
     collectionName: apiProduct.collectionName,
+    collectionPosition: apiProduct.collectionPosition,
     collectionImages,
     videoUrl: apiProduct.videoUrl,
   };

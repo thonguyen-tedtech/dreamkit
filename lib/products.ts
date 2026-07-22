@@ -22,6 +22,7 @@ export const COLOR_META: Readonly<Record<ColorKey, ColorMeta>> = {
   yellow: { label: "Vàng", hex: "#d9a93a" },
   gray: { label: "Xám", hex: "#8a8a8a" },
   cream: { label: "Kem", hex: "#e8e0cf" },
+  pink: { label: "Hồng", hex: "#e08cae" },
 };
 
 /** Product type labels ("Loại" facet). */

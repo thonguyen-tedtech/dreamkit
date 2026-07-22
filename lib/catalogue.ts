@@ -245,7 +245,7 @@ export function buildCatalogueCollectionsFromProducts(
     }
   }
 
-  return order.map((name) => {
+  const collections = order.map((name) => {
     const id = slugifyProductId(name);
     const items: CatalogueItem[] = [...imagesByName.get(name)!.entries()].map(
       ([url, colors], index) => ({
@@ -258,14 +258,21 @@ export function buildCatalogueCollectionsFromProducts(
     );
     const representative = representativeByName.get(name)!;
     return {
-      id,
-      title: name,
-      items,
-      productType: representative.type,
-      productId: representative.id,
-      videoUrl: representative.videoUrl,
+      collection: {
+        id,
+        title: name,
+        items,
+        productType: representative.type,
+        productId: representative.id,
+        videoUrl: representative.videoUrl,
+      } satisfies CatalogueCollection,
+      position: representative.collectionPosition,
     };
   });
+
+  return collections
+    .sort((a, b) => (a.position ?? Number.MAX_SAFE_INTEGER) - (b.position ?? Number.MAX_SAFE_INTEGER))
+    .map((entry) => entry.collection);
 }
 
 /** Returns every colour that appears in at least one catalogue item. */

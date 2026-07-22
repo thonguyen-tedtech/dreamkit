@@ -34,6 +34,7 @@ const EMPTY_PRODUCT: Product = {
   isNew: false,
   stock: 0,
   collectionName: "",
+  collectionPosition: undefined,
   collectionImages: [],
   videoUrl: "",
 };
@@ -65,6 +66,7 @@ function toInput(product: Product): ProductInput {
     isNew: product.isNew,
     stock: product.stock,
     collectionName: product.collectionName,
+    collectionPosition: product.collectionPosition,
     collectionImages,
     videoUrl: product.videoUrl,
   };
@@ -400,13 +402,29 @@ export function ProductManager() {
                 className={INPUT_CLASS}
               />
             </Field>
-            <Field label="Tên bộ sưu tập" error={errors.collectionName}>
-              <input
-                value={draft.collectionName ?? ""}
-                onChange={(event) => updateDraft("collectionName", event.target.value)}
-                className={INPUT_CLASS}
-              />
-            </Field>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Tên bộ sưu tập" error={errors.collectionName}>
+                <input
+                  value={draft.collectionName ?? ""}
+                  onChange={(event) => updateDraft("collectionName", event.target.value)}
+                  className={INPUT_CLASS}
+                />
+              </Field>
+              <Field label="Vị trí bộ sưu tập" error={errors.collectionPosition}>
+                <input
+                  type="number"
+                  min={0}
+                  value={draft.collectionPosition ?? ""}
+                  onChange={(event) =>
+                    updateDraft(
+                      "collectionPosition",
+                      event.target.value === "" ? undefined : Number(event.target.value),
+                    )
+                  }
+                  className={INPUT_CLASS}
+                />
+              </Field>
+            </div>
             <Field label="Link video" error={errors.videoUrl}>
               <input
                 type="url"

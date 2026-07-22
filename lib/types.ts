@@ -14,7 +14,8 @@ export type ColorKey =
   | "purple"
   | "yellow"
   | "gray"
-  | "cream";
+  | "cream"
+  | "pink";
 
 /** Product type facet ("Loại"). */
 export type ProductType = "set" | "jersey" | "polo";
@@ -53,6 +54,8 @@ export interface Product {
   readonly stock?: number;
   /** Name of the collection this product belongs to, if any. */
   readonly collectionName?: string;
+  /** Sort order among catalogue collections; lower shows first. */
+  readonly collectionPosition?: number;
   /** Gallery photos showcasing the collection this product belongs to. */
   readonly collectionImages?: readonly ProductImage[];
   /** Video URL (e.g. TikTok) showcasing this product, if any. */
