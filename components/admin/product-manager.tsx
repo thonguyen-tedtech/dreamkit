@@ -16,7 +16,6 @@ import {
   updateProductApi,
   type ProductInput,
 } from "@/lib/products-api";
-import { uploadImageApi } from "@/lib/uploads-api";
 import { formatPrice } from "@/lib/products";
 import type { ColorKey, Product, ProductType } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -80,7 +79,8 @@ export function ProductManager() {
   const [originalId, setOriginalId] = useState<string | undefined>();
   const [errors, setErrors] = useState<ProductFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [newCollectionImageUrl, setNewCollectionImageUrl] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   const isEditing = Boolean(originalId);
@@ -106,33 +106,17 @@ export function ProductManager() {
     setDraft((current) => ({ ...current, [field]: value }));
   }
 
-  async function handleAddImage(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) {
-      return;
-    }
-    if (!accessToken) {
-      showToast("Bạn cần đăng nhập với quyền quản trị để tải ảnh lên.", "error");
-      return;
-    }
-
-    setIsUploadingImage(true);
-    const result = await uploadImageApi(accessToken, file);
-    setIsUploadingImage(false);
-
-    if (!result.ok) {
-      showToast(result.message, "error");
+  function handleAddImage() {
+    const url = newImageUrl.trim();
+    if (!url) {
       return;
     }
 
     setDraft((current) => {
-      const images = [
-        ...(current.images ?? []),
-        { url: result.url, color: current.primaryColor },
-      ];
+      const images = [...(current.images ?? []), { url, color: current.primaryColor }];
       return { ...current, images, image: images[0].url };
     });
+    setNewImageUrl("");
   }
 
   function updateImageColor(index: number, color: ColorKey) {
@@ -165,23 +149,9 @@ export function ProductManager() {
     });
   }
 
-  async function handleAddCollectionImage(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) {
-      return;
-    }
-    if (!accessToken) {
-      showToast("Bạn cần đăng nhập với quyền quản trị để tải ảnh lên.", "error");
-      return;
-    }
-
-    setIsUploadingImage(true);
-    const result = await uploadImageApi(accessToken, file);
-    setIsUploadingImage(false);
-
-    if (!result.ok) {
-      showToast(result.message, "error");
+  function handleAddCollectionImage() {
+    const url = newCollectionImageUrl.trim();
+    if (!url) {
       return;
     }
 
@@ -189,9 +159,10 @@ export function ProductManager() {
       ...current,
       collectionImages: [
         ...(current.collectionImages ?? []),
-        { url: result.url, color: current.primaryColor },
+        { url, color: current.primaryColor },
       ],
     }));
+    setNewCollectionImageUrl("");
   }
 
   function updateCollectionImageColor(index: number, color: ColorKey) {
@@ -497,17 +468,17 @@ export function ProductManager() {
                     </button>
                   </div>
                 ))}
-                <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => void handleAddImage(event)}
-                    disabled={isUploadingImage}
-                    className={cn(INPUT_CLASS, "cursor-pointer py-2")}
+                    type="url"
+                    placeholder="https://example.com/anh.jpg"
+                    value={newImageUrl}
+                    onChange={(event) => setNewImageUrl(event.target.value)}
+                    className={INPUT_CLASS}
                   />
-                  {isUploadingImage ? (
-                    <span className="text-xs text-muted">Đang tải ảnh lên…</span>
-                  ) : null}
+                  <Button type="button" variant="outline" onClick={handleAddImage}>
+                    Thêm
+                  </Button>
                 </div>
               </div>
             </Field>
@@ -549,17 +520,17 @@ export function ProductManager() {
                     </button>
                   </div>
                 ))}
-                <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(event) => void handleAddCollectionImage(event)}
-                    disabled={isUploadingImage}
-                    className={cn(INPUT_CLASS, "cursor-pointer py-2")}
+                    type="url"
+                    placeholder="https://example.com/anh.jpg"
+                    value={newCollectionImageUrl}
+                    onChange={(event) => setNewCollectionImageUrl(event.target.value)}
+                    className={INPUT_CLASS}
                   />
-                  {isUploadingImage ? (
-                    <span className="text-xs text-muted">Đang tải ảnh lên…</span>
-                  ) : null}
+                  <Button type="button" variant="outline" onClick={handleAddCollectionImage}>
+                    Thêm
+                  </Button>
                 </div>
               </div>
             </Field>
@@ -625,11 +596,7 @@ export function ProductManager() {
               />
               Đánh dấu là sản phẩm mới
             </label>
-            <Button
-              type="submit"
-              disabled={isSubmitting || isUploadingImage}
-              className="mt-2"
-            >
+            <Button type="submit" disabled={isSubmitting} className="mt-2">
               {isSubmitting ? <Spinner /> : null}
               {isEditing ? "Cập nhật sản phẩm" : "Thêm sản phẩm"}
             </Button>

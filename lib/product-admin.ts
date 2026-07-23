@@ -73,9 +73,18 @@ export function validateProduct(product: Product): ProductFieldErrors {
   if (!product.images || product.images.length === 0) {
     errors.images = "Cần ít nhất một ảnh sản phẩm";
   } else if (
-    product.images.some((entry) => !entry.url.trim() || !COLOR_KEYS.includes(entry.color))
+    product.images.some(
+      (entry) =>
+        !/^https?:\/\//.test(entry.url.trim()) || !COLOR_KEYS.includes(entry.color),
+    )
   ) {
-    errors.images = "Mỗi ảnh cần có URL và màu hợp lệ";
+    errors.images = "Mỗi ảnh cần có URL hợp lệ (http:// hoặc https://) và màu hợp lệ";
+  }
+
+  if (
+    product.collectionImages?.some((entry) => !/^https?:\/\//.test(entry.url.trim()))
+  ) {
+    errors.collectionImages = "Mỗi ảnh bộ sưu tập cần có URL hợp lệ (http:// hoặc https://)";
   }
 
   if (product.colors.length === 0) {
