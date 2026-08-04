@@ -69,7 +69,19 @@ describe("mapApiOrderToOrder", () => {
       status: "pending",
       createdAt: "2026-01-01T00:00:00.000Z",
       note: "Leave at front desk",
+      failureReason: undefined,
     });
+  });
+
+  it("maps the failure reason when the order was cancelled by async processing", () => {
+    const order = mapApiOrderToOrder({
+      ...API_ORDER,
+      status: "cancelled",
+      failureReason: "Sản phẩm đã hết hàng",
+    });
+
+    expect(order.status).toBe("cancelled");
+    expect(order.failureReason).toBe("Sản phẩm đã hết hàng");
   });
 
   it("falls back to the order's own name/phone/email over the populated user", () => {
@@ -119,12 +131,12 @@ describe("createOrderApi", () => {
     vi.unstubAllGlobals();
   });
 
-  it("posts the order payload and maps the response", async () => {
+  it("posts the order payload and returns the accepted hash/status", async () => {
     vi.stubGlobal("fetch", fetchMock);
     fetchMock.mockResolvedValue({
       ok: true,
-      status: 201,
-      json: async () => API_ORDER,
+      status: 202,
+      json: async () => ({ hash: "abc-123", status: "pending" }),
     });
 
     const result = await createOrderApi({
@@ -134,8 +146,8 @@ describe("createOrderApi", () => {
 
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.order.id).toBe(API_ORDER._id);
-      expect(result.order.total).toBe(420_000);
+      expect(result.hash).toBe("abc-123");
+      expect(result.status).toBe("pending");
     }
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];

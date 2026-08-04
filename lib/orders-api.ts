@@ -34,6 +34,8 @@ export interface ApiOrder {
   readonly phone?: string;
   readonly email?: string;
   readonly note?: string;
+  /** Why the order was cancelled by async processing (e.g. out of stock), if applicable. */
+  readonly failureReason?: string;
   readonly createdAt: string;
   readonly updatedAt?: string;
 }
@@ -75,6 +77,7 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
     status: apiOrder.status as OrderStatus,
     createdAt: apiOrder.createdAt,
     note: apiOrder.note,
+    failureReason: apiOrder.failureReason,
   };
 }
 
@@ -112,6 +115,26 @@ export interface OrderMutationFailure {
 
 export type OrderMutationResult = OrderMutationSuccess | OrderMutationFailure;
 
+/** Response body for order creation: the API accepts the order asynchronously (202). */
+export interface ApiCreateOrderResponse {
+  readonly hash: string;
+  readonly status: string;
+}
+
+export interface CreateOrderSuccess {
+  readonly ok: true;
+  readonly hash: string;
+  readonly status: OrderStatus;
+}
+
+export interface CreateOrderFailure {
+  readonly ok: false;
+  readonly status: number;
+  readonly message: string;
+}
+
+export type CreateOrderResult = CreateOrderSuccess | CreateOrderFailure;
+
 function authHeaders(accessToken: string): HeadersInit {
   return { Authorization: `Bearer ${accessToken}` };
 }
@@ -119,12 +142,16 @@ function authHeaders(accessToken: string): HeadersInit {
 /**
  * Creates an order. Pass an access token to link it to the signed-in account;
  * without one it's a guest order and `name`/`phone` are required.
+ *
+ * The API accepts the order for async processing (202) and returns only its
+ * tracking hash and initial status; fetch the full order via `trackOrderByHashApi`
+ * or `fetchOrdersApi` once created.
  */
 export async function createOrderApi(
   input: CreateOrderInput,
   accessToken?: string,
-): Promise<OrderMutationResult> {
-  const result = await apiFetch<ApiOrder>("/api/orders", {
+): Promise<CreateOrderResult> {
+  const result = await apiFetch<ApiCreateOrderResponse>("/api/orders", {
     method: "POST",
     headers: accessToken ? authHeaders(accessToken) : undefined,
     body: JSON.stringify(input),
@@ -134,7 +161,7 @@ export async function createOrderApi(
     return { ok: false, status: result.status, message: result.message };
   }
 
-  return { ok: true, order: mapApiOrderToOrder(result.data) };
+  return { ok: true, hash: result.data.hash, status: result.data.status as OrderStatus };
 }
 
 /** Looks up a single order by its public tracking hash. No auth required. */

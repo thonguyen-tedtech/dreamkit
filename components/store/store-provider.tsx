@@ -83,16 +83,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [refreshOrders]);
 
   const createOrderAction = useCallback(
-    async (input: CreateOrderInput): Promise<Order | null> => {
+    async (input: CreateOrderInput) => {
       const result = await createOrderApi(input, accessToken ?? undefined);
       if (!result.ok) {
         showToast(result.message, "error");
         return null;
       }
-      setOrders((current) => [result.order, ...current]);
-      return result.order;
+      void refreshOrders();
+      return { hash: result.hash, status: result.status };
     },
-    [accessToken, showToast],
+    [accessToken, showToast, refreshOrders],
   );
 
   const updateOrderStatusAction = useCallback(

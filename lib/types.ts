@@ -174,6 +174,8 @@ export interface Order {
   readonly status: OrderStatus;
   readonly createdAt: string;
   readonly note?: string;
+  /** Why the order was cancelled by async processing (e.g. out of stock), if applicable. */
+  readonly failureReason?: string;
 }
 
 

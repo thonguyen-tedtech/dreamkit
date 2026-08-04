@@ -140,6 +140,12 @@ function OrderResult({ order }: OrderResultProps) {
       {order.note ? (
         <p className="mt-4 text-sm text-muted">Ghi chú: {order.note}</p>
       ) : null}
+
+      {order.status === "cancelled" && order.failureReason ? (
+        <p className="mt-4 rounded-card border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          Lý do huỷ đơn: {order.failureReason}
+        </p>
+      ) : null}
     </article>
   );
 }
