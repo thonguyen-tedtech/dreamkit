@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { QuantityStepper } from "@/components/cart/cart-view";
@@ -15,6 +16,8 @@ import { ColorSwatches } from "./color-swatches";
 import { ProductTabs } from "./product-tabs";
 import { RelatedProducts } from "./related-products";
 
+const PreOrderForm = dynamic(() => import("./pre-order-form"), { ssr: false });
+
 interface ProductDetailViewProps {
   readonly id: string;
 }
@@ -28,6 +31,7 @@ export function ProductDetailView({ id }: ProductDetailViewProps) {
   const [selectedSize, setSelectedSize] = useState<ProductSize>("M");
   const [quantity, setQuantity] = useState(1);
   const [justAdded, setJustAdded] = useState(false);
+  const [isPreOrderFormOpen, setIsPreOrderFormOpen] = useState(false);
   const { addItem } = useCart();
 
   if (!isHydrated) {
@@ -69,6 +73,7 @@ export function ProductDetailView({ id }: ProductDetailViewProps) {
     : [{ url: product.image, color: product.primaryColor }];
   const activeImage = images[Math.min(activeImageIndex, images.length - 1)];
   const color = selectedColor ?? product.primaryColor;
+  const isPreOrder = product.isPreOrder === true;
   const inStock = product.stock === undefined || product.stock > 0;
   const relatedProducts = products.filter((item) => item.id !== product.id);
 
@@ -206,9 +211,13 @@ export function ProductDetailView({ id }: ProductDetailViewProps) {
 
           <p className="text-sm text-muted">
             {TYPE_LABELS[product.type]} ·{" "}
-            <span className={inStock ? "text-foreground" : "text-red-600"}>
-              {inStock ? "Còn hàng" : "Hết hàng"}
-            </span>
+            {isPreOrder ? (
+              <span className="text-highlight">Đặt trước</span>
+            ) : (
+              <span className={inStock ? "text-foreground" : "text-red-600"}>
+                {inStock ? "Còn hàng" : "Hết hàng"}
+              </span>
+            )}
           </p>
 
           {product.colors.length > 1 ? (
@@ -270,14 +279,24 @@ export function ProductDetailView({ id }: ProductDetailViewProps) {
               quantity={quantity}
               onChange={(next) => setQuantity(Math.max(1, next))}
             />
-            <button
-              type="button"
-              onClick={handleAdd}
-              disabled={!inStock}
-              className="flex-1 rounded-card bg-accent px-6 py-3 text-xs font-medium uppercase tracking-label text-accent-foreground transition-colors hover:cursor-pointer hover:bg-foreground/85 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {!inStock ? "Hết hàng" : justAdded ? "Đã thêm vào giỏ" : "Thêm vào giỏ"}
-            </button>
+            {isPreOrder ? (
+              <button
+                type="button"
+                onClick={() => setIsPreOrderFormOpen(true)}
+                className="flex-1 rounded-card bg-accent px-6 py-3 text-xs font-medium uppercase tracking-label text-accent-foreground transition-colors hover:cursor-pointer hover:bg-foreground/85"
+              >
+                Đặt trước
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAdd}
+                disabled={!inStock}
+                className="flex-1 rounded-card bg-accent px-6 py-3 text-xs font-medium uppercase tracking-label text-accent-foreground transition-colors hover:cursor-pointer hover:bg-foreground/85 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {!inStock ? "Hết hàng" : justAdded ? "Đã thêm vào giỏ" : "Thêm vào giỏ"}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -285,6 +304,14 @@ export function ProductDetailView({ id }: ProductDetailViewProps) {
       <ProductTabs product={product} />
 
       <RelatedProducts products={relatedProducts} />
+
+      {isPreOrderFormOpen ? (
+        <PreOrderForm
+          product={product}
+          isOpen={isPreOrderFormOpen}
+          onClose={() => setIsPreOrderFormOpen(false)}
+        />
+      ) : null}
     </Container>
   );
 }

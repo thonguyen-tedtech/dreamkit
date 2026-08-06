@@ -33,6 +33,7 @@ const API_ORDER: ApiOrder = {
   paymentMethod: "cash",
   isPaid: false,
   hash: "abc-123",
+  address: "123 Main St, Springfield",
   note: "Leave at front desk",
   createdAt: "2026-01-01T00:00:00.000Z",
 };
@@ -48,6 +49,7 @@ describe("mapApiOrderToOrder", () => {
       name: "Jane Doe",
       phone: "+1-555-0100",
       email: "jane@dreamkit.vn",
+      address: "123 Main St, Springfield",
       lines: [
         {
           productId: "product-1",
@@ -109,6 +111,15 @@ describe("mapApiOrderToOrder", () => {
       size: "L",
     });
   });
+
+  it("maps a line's isPreOrder flag", () => {
+    const order = mapApiOrderToOrder({
+      ...API_ORDER,
+      items: [{ ...API_ORDER.items[0], isPreOrder: true }],
+    });
+
+    expect(order.lines[0].isPreOrder).toBe(true);
+  });
 });
 
 describe("createOrderApi", () => {
@@ -130,6 +141,7 @@ describe("createOrderApi", () => {
     const result = await createOrderApi({
       items: [{ productId: "product-1", quantity: 2, color: "blue", size: "M" }],
       paymentMethod: "cash",
+      address: "123 Main St, Springfield",
     });
 
     expect(result.ok).toBe(true);
@@ -142,6 +154,7 @@ describe("createOrderApi", () => {
     expect(JSON.parse(init.body as string)).toEqual({
       items: [{ productId: "product-1", quantity: 2, color: "blue", size: "M" }],
       paymentMethod: "cash",
+      address: "123 Main St, Springfield",
     });
   });
 
@@ -156,6 +169,7 @@ describe("createOrderApi", () => {
     const result = await createOrderApi({
       items: [{ productId: "product-1", quantity: 1, color: "blue", size: "M" }],
       paymentMethod: "cash",
+      address: "123 Main St, Springfield",
     });
 
     expect(result.ok).toBe(false);

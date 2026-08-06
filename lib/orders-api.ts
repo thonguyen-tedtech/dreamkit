@@ -15,6 +15,8 @@ export interface ApiOrderItem {
   readonly unitPrice: number;
   readonly color: string;
   readonly size: string;
+  /** Fixed at time of purchase by the backend from the product's pre-order state then. */
+  readonly isPreOrder?: boolean;
 }
 
 /** Order shape returned by the NestJS orders API. */
@@ -33,6 +35,7 @@ export interface ApiOrder {
   readonly name?: string;
   readonly phone?: string;
   readonly email?: string;
+  readonly address?: string;
   readonly note?: string;
   readonly createdAt: string;
   readonly updatedAt?: string;
@@ -48,6 +51,7 @@ function mapOrderItem(item: ApiOrderItem): OrderLine {
     lineTotal: item.unitPrice * item.quantity,
     color: item.color as ColorKey,
     size: item.size,
+    isPreOrder: item.isPreOrder,
   };
 }
 
@@ -64,6 +68,7 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
     name: apiOrder.name ?? user?.name,
     phone: apiOrder.phone ?? user?.phone,
     email: apiOrder.email ?? user?.email,
+    address: apiOrder.address,
     lines,
     subtotal,
     discountCode: apiOrder.discountCode,
@@ -89,6 +94,8 @@ export interface CreateOrderItemInput {
 export interface CreateOrderInput {
   readonly items: readonly CreateOrderItemInput[];
   readonly paymentMethod: PaymentMethod;
+  /** Delivery address; required by the backend for every order. */
+  readonly address: string;
   readonly discount?: number;
   readonly discountCode?: string;
   /** Required when no bearer token is sent (guest order). */

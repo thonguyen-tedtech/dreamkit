@@ -1,6 +1,15 @@
+"use client";
+
+import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useStore } from "@/components/store/store-context";
 import type { CatalogueCollection, CatalogueItem } from "@/lib/types";
 import { CatalogueImage } from "./catalogue-image";
+
+const PreOrderForm = dynamic(() => import("@/components/product/pre-order-form"), {
+  ssr: false,
+});
 
 interface CollectionSectionProps {
   readonly collection: CatalogueCollection;
@@ -13,6 +22,13 @@ export function CollectionSection({
   priorityImages = false,
   onImageOpen,
 }: CollectionSectionProps) {
+  const { products } = useStore();
+  const [isPreOrderFormOpen, setIsPreOrderFormOpen] = useState(false);
+  const preOrderProduct =
+    collection.isPreOrder && collection.productId
+      ? products.find((product) => product.id === collection.productId)
+      : undefined;
+
   return (
     <section aria-labelledby={`collection-${collection.id}`} className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-4">
@@ -45,6 +61,15 @@ export function CollectionSection({
                 <ArrowIcon />
               </Link>
             ) : null}
+            {preOrderProduct ? (
+              <button
+                type="button"
+                onClick={() => setIsPreOrderFormOpen(true)}
+                className="inline-flex h-9 items-center gap-2 rounded-card bg-accent px-4 text-[0.65rem] font-medium uppercase tracking-label text-accent-foreground transition-colors hover:cursor-pointer hover:bg-foreground/85"
+              >
+                Đặt trước
+              </button>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -60,6 +85,14 @@ export function CollectionSection({
           </li>
         ))}
       </ul>
+
+      {preOrderProduct && isPreOrderFormOpen ? (
+        <PreOrderForm
+          product={preOrderProduct}
+          isOpen={isPreOrderFormOpen}
+          onClose={() => setIsPreOrderFormOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }

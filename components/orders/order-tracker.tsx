@@ -137,8 +137,12 @@ function OrderResult({ order }: OrderResultProps) {
         ))}
       </ul>
 
+      {order.address ? (
+        <p className="mt-4 text-sm text-muted">Địa chỉ giao hàng: {order.address}</p>
+      ) : null}
+
       {order.note ? (
-        <p className="mt-4 text-sm text-muted">Ghi chú: {order.note}</p>
+        <p className="mt-1 text-sm text-muted">Ghi chú: {order.note}</p>
       ) : null}
     </article>
   );

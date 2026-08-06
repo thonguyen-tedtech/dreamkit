@@ -52,6 +52,8 @@ export interface Product {
   readonly isNew: boolean;
   /** Units currently in stock. */
   readonly stock?: number;
+  /** Available for pre-order, independent of stock; takes precedence over in/out-of-stock status when true. */
+  readonly isPreOrder?: boolean;
   /** Name of the collection this product belongs to, if any. */
   readonly collectionName?: string;
   /** Sort order among catalogue collections; lower shows first. */
@@ -115,6 +117,8 @@ export interface CatalogueCollection {
   readonly productId?: string;
   /** Video URL for the collection's representative product, if any. */
   readonly videoUrl?: string;
+  /** Whether the collection's representative product is available for pre-order. */
+  readonly isPreOrder?: boolean;
 }
 
 /** Lifecycle status for a customer order (mirrors the backend's OrderStatus enum). */
@@ -148,6 +152,8 @@ export interface OrderLine {
   readonly lineTotal: number;
   readonly color: ColorKey;
   readonly size: string;
+  /** Whether this line was purchased as a pre-order, fixed at time of purchase. */
+  readonly isPreOrder?: boolean;
 }
 
 export interface Order {
@@ -158,6 +164,8 @@ export interface Order {
   readonly name?: string;
   readonly phone?: string;
   readonly email?: string;
+  /** Delivery address captured at checkout. Optional only because orders placed before this field existed have none. */
+  readonly address?: string;
   readonly lines: readonly OrderLine[];
   /** Derived client-side: sum of each line's lineTotal (the backend doesn't persist it separately). */
   readonly subtotal: number;

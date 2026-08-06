@@ -41,7 +41,9 @@ export function OrderManager() {
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          {sortedOrders.map((order) => (
+          {sortedOrders.map((order) => {
+            const hasPreOrderLine = order.lines.some((line) => line.isPreOrder);
+            return (
             <article
               key={order.id}
               className="rounded-card border border-border bg-surface p-6"
@@ -71,6 +73,11 @@ export function OrderManager() {
                     >
                       {order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
                     </span>
+                    {hasPreOrderLine ? (
+                      <span className="rounded-full bg-accent px-2 py-0.5 font-medium text-accent-foreground">
+                        Có đặt trước
+                      </span>
+                    ) : null}
                   </p>
                 </div>
 
@@ -110,14 +117,23 @@ export function OrderManager() {
                   >
                     <span className="text-foreground">
                       {line.productName} ({line.color} · {line.size}) × {line.quantity}
+                      {line.isPreOrder ? (
+                        <span className="ml-2 rounded-full bg-accent px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-label text-accent-foreground">
+                          Đặt trước
+                        </span>
+                      ) : null}
                     </span>
                     <span className="text-muted">{formatPrice(line.lineTotal)}</span>
                   </li>
                 ))}
               </ul>
 
+              {order.address ? (
+                <p className="mt-4 text-sm text-muted">Địa chỉ giao hàng: {order.address}</p>
+              ) : null}
+
               {order.note ? (
-                <p className="mt-4 text-sm text-muted">Ghi chú: {order.note}</p>
+                <p className="mt-1 text-sm text-muted">Ghi chú: {order.note}</p>
               ) : null}
 
               <div className="mt-4 flex justify-end">
@@ -130,7 +146,8 @@ export function OrderManager() {
                 </button>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

@@ -265,6 +265,7 @@ export function buildCatalogueCollectionsFromProducts(
         productType: representative.type,
         productId: representative.id,
         videoUrl: representative.videoUrl,
+        isPreOrder: representative.isPreOrder,
       } satisfies CatalogueCollection,
       position: representative.collectionPosition,
     };

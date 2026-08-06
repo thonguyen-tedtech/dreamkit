@@ -42,6 +42,7 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
       name: user?.name ?? "",
       phone: user?.phone ?? "",
       email: user?.email ?? "",
+      address: user?.address ?? "",
       note: "",
       paymentMethod: "cash",
     },
@@ -53,6 +54,9 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
       setValue("email", user.email);
       if (user.phone) {
         setValue("phone", user.phone);
+      }
+      if (user.address) {
+        setValue("address", user.address);
       }
     }
   }, [user, setValue]);
@@ -75,6 +79,7 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
         size: line.size,
       })),
       paymentMethod: data.paymentMethod,
+      address: data.address.trim(),
       discountCode,
       name: data.name.trim() || undefined,
       phone: data.phone.trim() || undefined,
@@ -118,6 +123,17 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
           className={INPUT_CLASS}
         />
         {errors.email ? <p className="mt-1 text-xs text-red-600">{errors.email.message}</p> : null}
+      </div>
+      <div>
+        <textarea
+          {...register("address")}
+          placeholder="Địa chỉ giao hàng"
+          rows={2}
+          className={`${INPUT_CLASS} min-h-16 py-3`}
+        />
+        {errors.address ? (
+          <p className="mt-1 text-xs text-red-600">{errors.address.message}</p>
+        ) : null}
       </div>
       <div>
         <textarea

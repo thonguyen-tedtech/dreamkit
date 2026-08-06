@@ -32,6 +32,7 @@ const EMPTY_PRODUCT: Product = {
   type: "set",
   isNew: false,
   stock: 0,
+  isPreOrder: false,
   collectionName: "",
   collectionPosition: undefined,
   collectionImages: [],
@@ -64,6 +65,7 @@ function toInput(product: Product): ProductInput {
     type: product.type,
     isNew: product.isNew,
     stock: product.stock,
+    isPreOrder: product.isPreOrder,
     collectionName: product.collectionName,
     collectionPosition: product.collectionPosition,
     collectionImages,
@@ -82,6 +84,7 @@ export function ProductManager() {
   const [newImageUrl, setNewImageUrl] = useState("");
   const [newCollectionImageUrl, setNewCollectionImageUrl] = useState("");
   const [pendingId, setPendingId] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const isEditing = Boolean(originalId);
 
@@ -247,6 +250,30 @@ export function ProductManager() {
     }
   }
 
+  async function handleTogglePreOrder(product: Product) {
+    if (!accessToken) {
+      showToast("Bạn cần đăng nhập với quyền quản trị để thực hiện thao tác này.", "error");
+      return;
+    }
+
+    setTogglingId(product.id);
+    const result = await updateProductApi(accessToken, product.id, {
+      isPreOrder: !product.isPreOrder,
+    });
+    setTogglingId(null);
+
+    if (!result.ok) {
+      showToast(result.message, "error");
+      return;
+    }
+
+    await refreshProducts();
+    showToast(
+      result.product.isPreOrder ? "Đã bật đặt trước." : "Đã tắt đặt trước.",
+      "success",
+    );
+  }
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -277,12 +304,14 @@ export function ProductManager() {
                   <th className="px-4 py-3">Tồn kho</th>
                   <th className="px-4 py-3">Loại</th>
                   <th className="px-4 py-3">Mới</th>
+                  <th className="px-4 py-3">Đặt trước</th>
                   <th className="px-4 py-3">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
                 {sortedProducts.map((product) => {
                   const isPending = pendingId === product.id;
+                  const isToggling = togglingId === product.id;
                   return (
                     <tr key={product.id} className="border-b border-border last:border-b-0">
                       <td className="px-4 py-4">
@@ -305,6 +334,31 @@ export function ProductManager() {
                       <td className="px-4 py-4">{product.stock ?? "—"}</td>
                       <td className="px-4 py-4">{product.type}</td>
                       <td className="px-4 py-4">{product.isNew ? "Có" : "Không"}</td>
+                      <td className="px-4 py-4">
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={product.isPreOrder === true}
+                          disabled={isToggling}
+                          onClick={() => void handleTogglePreOrder(product)}
+                          className={cn(
+                            "inline-flex h-6 w-11 shrink-0 items-center rounded-full border border-border transition-colors hover:cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
+                            product.isPreOrder ? "bg-accent" : "bg-surface",
+                          )}
+                          aria-label={
+                            product.isPreOrder
+                              ? `Tắt đặt trước cho ${product.name}`
+                              : `Bật đặt trước cho ${product.name}`
+                          }
+                        >
+                          <span
+                            className={cn(
+                              "size-4 rounded-full bg-background shadow transition-transform",
+                              product.isPreOrder ? "translate-x-6" : "translate-x-1",
+                            )}
+                          />
+                        </button>
+                      </td>
                       <td className="px-4 py-4">
                         <div className="flex gap-2">
                           <button
