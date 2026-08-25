@@ -3,15 +3,19 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Container } from "@/components/ui/container";
-import { UserGuard } from "@/components/user/user-guard";
-import { UserProfile } from "@/components/user/user-profile";
+import { TournamentDetail } from "@/components/tournaments/tournament-detail";
 
 export const metadata: Metadata = {
-  title: "Tài khoản — Dreamkit",
-  description: "Xem thông tin tài khoản và lịch sử đơn hàng Dreamkit.",
+  title: "Chi tiết giải đấu — Dreamkit",
 };
 
-export default function AccountPage() {
+export default async function TournamentDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   return (
     <>
       <SiteHeader />
@@ -25,15 +29,17 @@ export default function AccountPage() {
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li className="text-foreground">Tài khoản</li>
+              <li>
+                <Link href="/tournaments" className="hover:text-foreground">
+                  Giải đấu
+                </Link>
+              </li>
             </ol>
           </nav>
         </Container>
 
         <Container className="pb-24">
-          <UserGuard>
-            <UserProfile />
-          </UserGuard>
+          <TournamentDetail tournamentId={id} canManage={false} />
         </Container>
       </main>
       <SiteFooter />

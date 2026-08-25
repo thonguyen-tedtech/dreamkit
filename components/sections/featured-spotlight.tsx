@@ -29,24 +29,6 @@ export function FeaturedSpotlight() {
             </h2>
             <p className="text-base leading-relaxed text-muted">{story.body}</p>
 
-            <div className="flex items-center gap-6 border-t border-border pt-6">
-              {story.palette.map((swatch) => (
-                <div key={swatch.label} className="flex items-center gap-3">
-                  <span
-                    className="size-8 rounded-full border border-border"
-                    style={{ backgroundColor: swatch.hex }}
-                    aria-hidden="true"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-xs font-semibold uppercase tracking-label text-foreground">
-                      {swatch.label}
-                    </span>
-                    <span className="text-xs text-muted">{swatch.hex}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <Button className="mt-2 w-fit">Xem câu chuyện</Button>
           </div>
         </div>

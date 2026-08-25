@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
+import { useAdminAuth } from "./admin-auth-context";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
@@ -72,7 +72,7 @@ function toInput(product: Product): ProductInput {
 }
 
 export function ProductManager() {
-  const { accessToken } = useAuthModal();
+  const { accessToken } = useAdminAuth();
   const { showToast } = useToast();
   const { products, refreshProducts } = useStore();
   const [draft, setDraft] = useState<Product>(EMPTY_PRODUCT);

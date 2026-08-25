@@ -1,13 +1,40 @@
 "use client";
 
-import { useMemo } from "react";
-import { useStore } from "@/components/store/store-context";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAdminAuth } from "./admin-auth-context";
+import { LoadingOverlay } from "@/components/ui/spinner";
+import { useToast } from "@/components/ui/toast-context";
+import { deleteOrderApi, fetchOrdersApi, updateOrderApi } from "@/lib/orders-api";
 import { formatPrice } from "@/lib/products";
 import { ORDER_STATUS_LABELS, ORDER_STATUSES, PAYMENT_METHOD_LABELS } from "@/lib/orders";
-import type { OrderStatus } from "@/lib/types";
+import type { Order, OrderStatus } from "@/lib/types";
 
 export function OrderManager() {
-  const { orders, updateOrderStatus, deleteOrder } = useStore();
+  const { accessToken } = useAdminAuth();
+  const { showToast } = useToast();
+  const [orders, setOrders] = useState<readonly Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadOrders = useCallback(async () => {
+    if (!accessToken) {
+      return;
+    }
+    setIsLoading(true);
+    const result = await fetchOrdersApi(accessToken);
+    setIsLoading(false);
+
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+    setError(null);
+    setOrders(result.orders);
+  }, [accessToken]);
+
+  useEffect(() => {
+    void loadOrders();
+  }, [loadOrders]);
 
   const sortedOrders = useMemo(
     () =>
@@ -17,10 +44,24 @@ export function OrderManager() {
     [orders],
   );
 
-  function handleDelete(id: string) {
-    if (window.confirm("Xoá đơn hàng này?")) {
-      void deleteOrder(id);
+  async function handleStatusChange(id: string, status: OrderStatus) {
+    if (!accessToken) return;
+    const result = await updateOrderApi(accessToken, id, { status });
+    if (!result.ok) {
+      showToast(result.message, "error");
+      return;
     }
+    setOrders((current) => current.map((order) => (order.id === id ? result.order : order)));
+  }
+
+  async function handleDelete(id: string) {
+    if (!accessToken || !window.confirm("Xoá đơn hàng này?")) return;
+    const result = await deleteOrderApi(accessToken, id);
+    if (!result.ok) {
+      showToast(result.message, "error");
+      return;
+    }
+    setOrders((current) => current.filter((order) => order.id !== id));
   }
 
   return (
@@ -32,7 +73,13 @@ export function OrderManager() {
         </p>
       </div>
 
-      {sortedOrders.length === 0 ? (
+      {isLoading ? (
+        <LoadingOverlay label="Đang tải danh sách đơn hàng…" />
+      ) : error ? (
+        <div className="rounded-card border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      ) : sortedOrders.length === 0 ? (
         <div className="rounded-card border border-dashed border-border py-20 text-center">
           <p className="font-display text-2xl text-foreground">Chưa có đơn hàng</p>
           <p className="mt-2 text-sm text-muted">
@@ -88,7 +135,7 @@ export function OrderManager() {
                   <select
                     value={order.status}
                     onChange={(event) =>
-                      void updateOrderStatus(order.id, event.target.value as OrderStatus)
+                      void handleStatusChange(order.id, event.target.value as OrderStatus)
                     }
                     className="h-10 rounded-card border border-border bg-background px-3 text-sm text-foreground"
                     aria-label={`Trạng thái đơn ${order.hash}`}
@@ -123,7 +170,7 @@ export function OrderManager() {
               <div className="mt-4 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => handleDelete(order.id)}
+                  onClick={() => void handleDelete(order.id)}
                   className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
                 >
                   Xoá đơn

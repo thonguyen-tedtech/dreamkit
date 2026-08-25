@@ -17,7 +17,7 @@ const CONTACT_LINKS: readonly ContactLink[] = [
 ];
 
 const CONTACT_LINK_CLASSNAME =
-  "inline-flex h-14 items-center justify-center gap-2 rounded-card bg-accent px-9 text-sm font-medium uppercase tracking-label text-accent-foreground transition-colors duration-200 hover:bg-foreground/85";
+  "inline-flex grow h-14 items-center justify-center gap-2 rounded-card bg-accent px-9 text-sm font-medium uppercase tracking-label text-accent-foreground transition-colors duration-200 hover:bg-foreground/85";
 
 const TEAM_PERKS: readonly TeamPerk[] = [
   {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
+import { useAdminAuth } from "./admin-auth-context";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
 import type { Contact } from "@/lib/types";
 
 export function ContactManager() {
-  const { accessToken } = useAuthModal();
+  const { accessToken } = useAdminAuth();
   const { showToast } = useToast();
   const [contacts, setContacts] = useState<readonly Contact[]>([]);
   const [isLoading, setIsLoading] = useState(true);

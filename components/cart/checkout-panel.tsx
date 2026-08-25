@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
 import { useStore } from "@/components/store/store-context";
 import {
   checkoutFormSchema,
@@ -27,40 +26,28 @@ const PAYMENT_OPTIONS: readonly { readonly value: PaymentMethod; readonly label:
 export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
   const { items, clear } = useCart();
   const { createOrder } = useStore();
-  const { user, isAuthenticated } = useAuthModal();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
   } = useForm<CheckoutFormType>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      name: user?.name ?? "",
-      phone: user?.phone ?? "",
-      email: user?.email ?? "",
+      name: "",
+      phone: "",
+      email: "",
       note: "",
       paymentMethod: "cash",
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      setValue("name", user.name);
-      setValue("email", user.email);
-      if (user.phone) {
-        setValue("phone", user.phone);
-      }
-    }
-  }, [user, setValue]);
-
   async function onSubmit(data: CheckoutFormType) {
     setError(null);
 
-    if (!isAuthenticated && (!data.name.trim() || !data.phone.trim())) {
+    if (!data.name.trim() || !data.phone.trim()) {
       setError("Vui lòng điền đầy đủ thông tin liên hệ.");
       return;
     }

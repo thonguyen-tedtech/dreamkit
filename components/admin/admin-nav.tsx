@@ -8,6 +8,7 @@ const ADMIN_LINKS = [
   { href: "/admin/", label: "Tổng quan" },
   { href: "/admin/products/", label: "Sản phẩm" },
   { href: "/admin/orders/", label: "Đơn hàng" },
+  { href: "/admin/tournaments/", label: "Giải đấu" },
   { href: "/admin/discount-codes/", label: "Mã giảm giá" },
   { href: "/admin/users/", label: "Khách hàng" },
   { href: "/admin/contacts/", label: "Liên hệ" },

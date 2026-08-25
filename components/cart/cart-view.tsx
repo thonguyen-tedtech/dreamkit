@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
 import { applyDiscountCode, type DiscountApplyFailureReason } from "@/lib/discount-codes";
 import { validateDiscountCodeApi } from "@/lib/discount-codes-api";
 import { COLOR_META, formatPrice } from "@/lib/products";
@@ -34,7 +33,6 @@ interface AppliedDiscount {
 export function CartView() {
   const { items, subtotal, count, removeItem, setQuantity, clear } = useCart();
   const { showToast } = useToast();
-  const { isAuthenticated } = useAuthModal();
   const [orderHash, setOrderHash] = useState<string | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
   const [discountInput, setDiscountInput] = useState("");
@@ -95,11 +93,6 @@ export function CartView() {
           <Link href="/shop" className={cn(LINK_BUTTON_CLASS)}>
             Tiếp tục mua sắm
           </Link>
-          {isAuthenticated ? (
-            <Link href="/account" className={cn(LINK_BUTTON_CLASS)}>
-              Xem đơn hàng
-            </Link>
-          ) : null}
         </div>
       </div>
     );

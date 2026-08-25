@@ -16,7 +16,7 @@ export function CategoryTabs({ activeType, onSelect }: CategoryTabsProps) {
     <div
       role="tablist"
       aria-label="Lọc theo loại sản phẩm"
-      className="flex flex-wrap gap-8 border-b border-border"
+      className="flex flex-nowrap gap-4 overflow-x-auto border-b border-border sm:gap-8"
     >
       {CATALOGUE_TYPE_TABS.map((type) => {
         const isActive = type === activeType;
@@ -28,7 +28,7 @@ export function CategoryTabs({ activeType, onSelect }: CategoryTabsProps) {
             aria-selected={isActive}
             onClick={() => onSelect(type)}
             className={cn(
-              "-mb-px border-b-2 pb-4 text-xs font-medium uppercase tracking-label transition-colors hover:cursor-pointer",
+              "-mb-px shrink-0 whitespace-nowrap border-b-2 pb-4 text-xs font-medium uppercase tracking-label transition-colors hover:cursor-pointer",
               isActive
                 ? "border-foreground text-foreground"
                 : "border-transparent text-muted hover:text-foreground",

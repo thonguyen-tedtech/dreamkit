@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui/container";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
 import { useCart } from "@/components/cart/cart-context";
 import { cn } from "@/lib/cn";
 
@@ -18,12 +18,34 @@ const NAV_LINKS: readonly NavLink[] = [
   { label: "Cửa hàng", href: "/shop" },
   { label: "Catalogue", href: "/catalogue" },
   { label: "Portfolio", href: "/portfolio" },
+  { label: "Giải đấu", href: "/tournaments" },
 ];
+
+/** Drops a trailing slash (this site's `trailingSlash: true` build adds one) so pathnames compare cleanly against `NAV_LINKS`. */
+function normalizePath(path: string): string {
+  if (path.length > 1 && path.endsWith("/")) {
+    return path.slice(0, -1);
+  }
+  return path;
+}
 
 export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { open: openAuth, isAuthenticated, isAdmin } = useAuthModal();
   const { count } = useCart();
+  const pathname = normalizePath(usePathname());
+  const activeIndex = NAV_LINKS.findIndex((link) => link.href === pathname);
+  const navListRef = useRef<HTMLUListElement>(null);
+  const [highlight, setHighlight] = useState<{ left: number; width: number } | null>(null);
+
+  useEffect(() => {
+    const container = navListRef.current;
+    const activeItem = activeIndex >= 0 ? container?.children[activeIndex] : undefined;
+    if (!(activeItem instanceof HTMLElement)) {
+      setHighlight(null);
+      return;
+    }
+    setHighlight({ left: activeItem.offsetLeft, width: activeItem.offsetWidth });
+  }, [activeIndex]);
 
   return (
     <header
@@ -47,12 +69,25 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Điều hướng chính" className="hidden md:block">
-          <ul className="flex items-center gap-9">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
+          <ul ref={navListRef} className="relative flex items-center gap-9">
+            {highlight ? (
+              <span
+                aria-hidden="true"
+                className="absolute -inset-y-2 rounded-card bg-surface-strong transition-[left,width] duration-300 ease-out"
+                style={{ left: highlight.left - 12, width: highlight.width + 24 }}
+              />
+            ) : null}
+            {NAV_LINKS.map((link, index) => (
+              <li key={link.href} className="relative">
                 <Link
                   href={link.href}
-                  className="text-xs font-medium uppercase tracking-label text-foreground/80 transition-colors hover:text-foreground"
+                  aria-current={index === activeIndex ? "page" : undefined}
+                  className={cn(
+                    "text-xs font-medium uppercase tracking-label transition-colors",
+                    index === activeIndex
+                      ? "text-foreground"
+                      : "text-foreground/80 hover:text-foreground",
+                  )}
                 >
                   {link.label}
                 </Link>
@@ -81,24 +116,6 @@ export function SiteHeader() {
               </span>
             ) : null}
           </Link>
-          {isAuthenticated ? (
-            <Link
-              href="/account"
-              aria-label="Tài khoản"
-              className="text-foreground/80 transition-colors hover:text-foreground"
-            >
-              <UserIcon />
-            </Link>
-          ) : null}
-          {!isAuthenticated ? (
-            <button
-              type="button"
-              onClick={() => openAuth("login")}
-              className="hidden rounded-card border border-foreground px-4 py-2 text-xs font-medium uppercase tracking-label text-foreground transition-colors hover:cursor-pointer hover:bg-foreground hover:text-background md:inline-flex"
-            >
-              Đăng nhập
-            </button>
-          ) : null}
           <button
             type="button"
             aria-label={isMenuOpen ? "Đóng menu" : "Mở menu"}
@@ -133,43 +150,6 @@ export function SiteHeader() {
               </Link>
             </li>
           ))}
-          {!isAuthenticated ? (
-            <li>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  openAuth("login");
-                }}
-                className="block w-full py-2 text-left text-sm font-medium uppercase tracking-label text-foreground/80 hover:cursor-pointer hover:text-foreground"
-              >
-                Đăng nhập / Đăng ký
-              </button>
-            </li>
-          ) : (
-            <>
-              <li>
-                <Link
-                  href="/account"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block py-2 text-sm font-medium uppercase tracking-label text-foreground/80 hover:text-foreground"
-                >
-                  Tài khoản
-                </Link>
-              </li>
-              {isAdmin ? (
-                <li>
-                  <Link
-                    href="/admin"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block py-2 text-sm font-medium uppercase tracking-label text-foreground/80 hover:text-foreground"
-                  >
-                    Quản trị
-                  </Link>
-                </li>
-              ) : null}
-            </>
-          )}
         </ul>
       </nav>
     </header>
@@ -181,20 +161,6 @@ function SearchIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
       <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
-      <path
-        d="M5 19a7 7 0 0 1 14 0"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
     </svg>
   );
 }

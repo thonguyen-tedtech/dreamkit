@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
+import { useAdminAuth } from "./admin-auth-context";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
@@ -127,7 +127,7 @@ function toInput(candidate: DiscountCode): DiscountCodeInput {
 }
 
 export function DiscountCodeManager() {
-  const { accessToken } = useAuthModal();
+  const { accessToken } = useAdminAuth();
   const { showToast } = useToast();
   const [discountCodes, setDiscountCodes] = useState<readonly DiscountCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);

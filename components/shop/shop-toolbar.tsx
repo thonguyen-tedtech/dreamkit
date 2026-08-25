@@ -45,11 +45,11 @@ export function ShopToolbar({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2">
           <label
             htmlFor={pageSizeId}
-            className="text-xs font-medium uppercase tracking-label text-muted"
+            className="shrink-0 text-xs font-medium uppercase tracking-label text-muted"
           >
             Hiển thị
           </label>
@@ -57,7 +57,7 @@ export function ShopToolbar({
             id={pageSizeId}
             value={pageSize}
             onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            className={SELECT_CLASS}
+            className={`${SELECT_CLASS} w-full sm:w-auto`}
           >
             {PAGE_SIZE_OPTIONS.map((option) => (
               <option key={option} value={option}>
@@ -74,7 +74,7 @@ export function ShopToolbar({
           id={sortId}
           value={sort}
           onChange={(event) => onSortChange(event.target.value as SortKey)}
-          className={SELECT_CLASS}
+          className={`${SELECT_CLASS} w-full sm:w-auto`}
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>

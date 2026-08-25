@@ -52,7 +52,7 @@ function ProductCardImpl({ product, priority = false }: ProductCardProps) {
             {product.name}
           </h3>
         </Link>
-        <div className="mt-1 flex items-center justify-between">
+        <div className="mt-1 flex flex-col items-center justify-between">
           <span className="text-sm font-semibold text-foreground">
             {formatPrice(product.price)}
           </span>

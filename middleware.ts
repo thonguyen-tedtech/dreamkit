@@ -24,16 +24,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // The login page itself must stay reachable while signed out. Compared
+  // loosely because `trailingSlash: true` normalizes "/admin/login" to
+  // "/admin/login/".
+  const loginPath = withBasePath("/admin/login");
+  if (pathname === loginPath || pathname === `${loginPath}/`) {
+    return NextResponse.next();
+  }
+
   const user = readSessionFromCookieValue(
     request.cookies.get(SESSION_COOKIE_KEY)?.value,
   );
 
-  if (!user) {
-    return NextResponse.redirect(new URL(withBasePath("/"), request.url));
-  }
-
-  if (user.role !== "admin") {
-    return NextResponse.redirect(new URL(withBasePath("/account"), request.url));
+  if (!user || user.role !== "admin") {
+    return NextResponse.redirect(new URL(`${loginPath}/`, request.url));
   }
 
   return NextResponse.next();

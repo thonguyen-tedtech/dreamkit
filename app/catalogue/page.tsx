@@ -30,7 +30,8 @@ export default function CataloguePage() {
           </nav>
 
           <h1 className="mt-6 text-center font-display text-4xl uppercase tracking-[0.08em] text-foreground sm:text-5xl">
-            Catalogue sản phẩm
+            <span className="block sm:inline">Catalogue</span>{" "}
+            <span className="block sm:inline">sản phẩm</span>
           </h1>
         </Container>
 

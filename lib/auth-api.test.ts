@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { loginApi, registerApi } from "./auth-api";
+import { loginApi } from "./auth-api";
 
 const fetchMock = vi.fn();
 
@@ -76,58 +76,5 @@ describe("loginApi", () => {
     if (!result.ok) {
       expect(result.code).toBe("email-not-verified");
     }
-  });
-});
-
-describe("registerApi", () => {
-  it("returns success message on 201", async () => {
-    vi.stubGlobal("fetch", fetchMock);
-    fetchMock.mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({
-        message: "Registration successful. Please verify your email before login.",
-        email: "new@dreamkit.vn",
-      }),
-    });
-
-    const result = await registerApi({
-      name: "New User",
-      email: "new@dreamkit.vn",
-      password: "secret123",
-      confirmPassword: "secret123",
-      address: "1 Main St",
-      phone: "555-0100",
-    });
-
-    expect(result.ok).toBe(true);
-    if (result.ok) {
-      expect(result.email).toBe("new@dreamkit.vn");
-    }
-  });
-
-  it("maps 409 to email taken", async () => {
-    vi.stubGlobal("fetch", fetchMock);
-    fetchMock.mockResolvedValue({
-      ok: false,
-      status: 409,
-      statusText: "Conflict",
-      json: async () => ({ message: "Email already in use" }),
-    });
-
-    const result = await registerApi({
-      name: "User",
-      email: "taken@dreamkit.vn",
-      password: "secret123",
-      confirmPassword: "secret123",
-      address: "1 Main St",
-      phone: "555-0100",
-    });
-
-    expect(result).toEqual({
-      ok: false,
-      code: "email-taken",
-      message: "Email này đã được sử dụng.",
-    });
   });
 });

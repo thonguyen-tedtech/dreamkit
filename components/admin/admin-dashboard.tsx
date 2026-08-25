@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
+import { useAdminAuth } from "./admin-auth-context";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
@@ -97,7 +97,7 @@ function chartDateRange(granularity: StatisticsGranularity): {
 }
 
 export function AdminDashboard() {
-  const { accessToken } = useAuthModal();
+  const { accessToken } = useAdminAuth();
   const { showToast } = useToast();
 
   const [{ startDate, endDate }, setAppliedRange] = useState(defaultDateRange);

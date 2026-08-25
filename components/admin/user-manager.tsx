@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAuthModal } from "@/components/auth/auth-modal-context";
+import { useAdminAuth } from "./admin-auth-context";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay, Spinner } from "@/components/ui/spinner";
 import { useToast } from "@/components/ui/toast-context";
@@ -14,7 +14,7 @@ const ROLE_LABELS: Readonly<Record<UserRole, string>> = {
 };
 
 export function UserManager() {
-  const { accessToken, user: currentUser } = useAuthModal();
+  const { accessToken, user: currentUser } = useAdminAuth();
   const { showToast } = useToast();
   const [users, setUsers] = useState<readonly User[]>([]);
   const [isLoading, setIsLoading] = useState(true);

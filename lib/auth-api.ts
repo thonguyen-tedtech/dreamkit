@@ -1,4 +1,4 @@
-import type { LoginValues, RegisterValues } from "./auth-validation";
+import type { LoginValues } from "./auth-validation";
 import { apiFetch } from "./api-client";
 import type { AuthUser, UserRole } from "./types";
 
@@ -20,21 +20,12 @@ export interface LoginApiResponse {
   readonly user: ApiUser;
 }
 
-export interface RegisterApiResponse {
-  readonly message: string;
-  readonly email: string;
-}
-
 export interface AuthSession {
   readonly user: AuthUser;
   readonly accessToken: string;
 }
 
-export type AuthErrorCode =
-  | "invalid-credentials"
-  | "email-not-verified"
-  | "email-taken"
-  | "network-error";
+export type AuthErrorCode = "invalid-credentials" | "email-not-verified" | "network-error";
 
 export interface AuthSuccess {
   readonly ok: true;
@@ -48,20 +39,6 @@ export interface AuthFailure {
 }
 
 export type AuthResult = AuthSuccess | AuthFailure;
-
-export interface RegisterSuccess {
-  readonly ok: true;
-  readonly message: string;
-  readonly email: string;
-}
-
-export interface RegisterFailure {
-  readonly ok: false;
-  readonly code: AuthErrorCode;
-  readonly message: string;
-}
-
-export type RegisterResult = RegisterSuccess | RegisterFailure;
 
 function mapApiRole(role: ApiUser["role"]): UserRole {
   return role === "admin" ? "admin" : "customer";
@@ -119,50 +96,6 @@ export async function loginApi(values: LoginValues): Promise<AuthResult> {
       user: mapApiUserToAuthUser(result.data.user),
       accessToken: result.data.accessToken,
     },
-  };
-}
-
-/** Registers a new account; email verification is required before login. */
-export async function registerApi(values: RegisterValues): Promise<RegisterResult> {
-  const result = await apiFetch<RegisterApiResponse>("/api/auth/register", {
-    method: "POST",
-    body: JSON.stringify({
-      email: values.email.trim(),
-      name: values.name.trim(),
-      password: values.password,
-      address: values.address.trim(),
-      phone: values.phone.trim(),
-    }),
-  });
-
-  if (!result.ok) {
-    if (result.status === 0) {
-      return {
-        ok: false,
-        code: "network-error",
-        message: result.message,
-      };
-    }
-
-    if (result.status === 409) {
-      return {
-        ok: false,
-        code: "email-taken",
-        message: "Email này đã được sử dụng.",
-      };
-    }
-
-    return {
-      ok: false,
-      code: "network-error",
-      message: result.message,
-    };
-  }
-
-  return {
-    ok: true,
-    message: result.data.message,
-    email: result.data.email,
   };
 }
 
