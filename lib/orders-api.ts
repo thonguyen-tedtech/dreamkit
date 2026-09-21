@@ -1,20 +1,29 @@
 import { apiFetch } from "./api-client";
 import type { ApiUser } from "./auth-api";
-import type { ColorKey, Order, OrderLine, OrderStatus, PaymentMethod } from "./types";
+import { resolveProductImage } from "./products-api";
+import type {
+  Order,
+  OrderCustomizationDetail,
+  OrderLine,
+  OrderStatus,
+  OrderType,
+  PaymentMethod,
+  ProductDesignMode,
+} from "./types";
 
 /** Product reference embedded in an order item; populated by the backend. */
 export interface ApiOrderProductRef {
   readonly _id: string;
   readonly name: string;
+  readonly image?: string;
 }
 
 /** Order line shape returned by the NestJS orders API. */
 export interface ApiOrderItem {
-  readonly product: ApiOrderProductRef | string;
-  readonly quantity: number;
+  readonly product?: ApiOrderProductRef | string;
+  readonly productName?: string;
   readonly unitPrice: number;
-  readonly color: string;
-  readonly size: string;
+  readonly customizationDetails: readonly OrderCustomizationDetail[];
   /** Fixed at time of purchase by the backend from the product's pre-order state then. */
   readonly isPreOrder?: boolean;
 }
@@ -37,20 +46,28 @@ export interface ApiOrder {
   readonly email?: string;
   readonly address?: string;
   readonly note?: string;
+  readonly orderType: string;
+  readonly productDesignMode: string;
+  readonly customDesignImages?: readonly string[];
+  readonly trackingNumber?: string;
+  readonly confirmedAt?: string;
+  readonly productionCompletedAt?: string;
+  readonly printingCompletedAt?: string;
+  readonly shippingCompletedAt?: string;
   readonly createdAt: string;
   readonly updatedAt?: string;
 }
 
 function mapOrderItem(item: ApiOrderItem): OrderLine {
-  const product = typeof item.product === "string" ? null : item.product;
+  const product = typeof item.product === "string" ? null : (item.product ?? null);
+  const totalQuantity = item.customizationDetails.reduce((sum, detail) => sum + detail.quantity, 0);
   return {
     productId: product?._id ?? (typeof item.product === "string" ? item.product : ""),
-    productName: product?.name ?? "Sản phẩm",
+    productName: item.productName ?? product?.name ?? "Sản phẩm",
+    productImage: product?.image ? resolveProductImage(product.image) : undefined,
     unitPrice: item.unitPrice,
-    quantity: item.quantity,
-    lineTotal: item.unitPrice * item.quantity,
-    color: item.color as ColorKey,
-    size: item.size,
+    customizationDetails: item.customizationDetails,
+    lineTotal: item.unitPrice * totalQuantity,
     isPreOrder: item.isPreOrder,
   };
 }
@@ -78,6 +95,14 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
     paymentMethod: apiOrder.paymentMethod as PaymentMethod,
     isPaid: apiOrder.isPaid,
     status: apiOrder.status as OrderStatus,
+    orderType: apiOrder.orderType as OrderType,
+    productDesignMode: apiOrder.productDesignMode as ProductDesignMode,
+    customDesignImages: apiOrder.customDesignImages,
+    trackingNumber: apiOrder.trackingNumber,
+    confirmedAt: apiOrder.confirmedAt,
+    productionCompletedAt: apiOrder.productionCompletedAt,
+    printingCompletedAt: apiOrder.printingCompletedAt,
+    shippingCompletedAt: apiOrder.shippingCompletedAt,
     createdAt: apiOrder.createdAt,
     note: apiOrder.note,
   };
@@ -85,9 +110,7 @@ export function mapApiOrderToOrder(apiOrder: ApiOrder): Order {
 
 export interface CreateOrderItemInput {
   readonly productId: string;
-  readonly quantity: number;
-  readonly color: string;
-  readonly size: string;
+  readonly customizationDetails: readonly OrderCustomizationDetail[];
 }
 
 /** Fields the checkout form submits to create an order. */
@@ -104,6 +127,12 @@ export interface CreateOrderInput {
   readonly phone?: string;
   readonly email?: string;
   readonly note?: string;
+  /** Defaults to "single" on the backend when omitted. */
+  readonly orderType?: OrderType;
+  /** Defaults to "standard" on the backend when omitted. */
+  readonly productDesignMode?: ProductDesignMode;
+  /** Links to the custom design images. At least one required when productDesignMode is "custom". */
+  readonly customDesignImages?: readonly string[];
 }
 
 export interface OrderMutationSuccess {
@@ -187,6 +216,8 @@ export interface UpdateOrderInput {
   readonly status?: OrderStatus;
   readonly paymentMethod?: PaymentMethod;
   readonly isPaid?: boolean;
+  /** Required (here or already on the order) when status is set to "delivered". */
+  readonly trackingNumber?: string;
 }
 
 /** Updates an order's status/payment fields. Admin only. */

@@ -13,18 +13,27 @@ import {
 } from "@/components/schemas/checkout.schema";
 import type { PaymentMethod } from "@/lib/types";
 import { useCart } from "./cart-context";
+import { cartLineKey, type LineCustomization } from "./customization-step";
 
 interface CheckoutPanelProps {
   readonly discountCode?: string;
+  readonly customizations: Readonly<Record<string, LineCustomization>>;
+  readonly onBack: () => void;
   readonly onSuccess: (orderHash: string) => void;
 }
 
-const PAYMENT_OPTIONS: readonly { readonly value: PaymentMethod; readonly label: string }[] = [
+interface PaymentOption {
+  readonly value: PaymentMethod;
+  readonly label: string;
+  readonly disabled?: boolean;
+}
+
+const PAYMENT_OPTIONS: readonly PaymentOption[] = [
   { value: "cash", label: "Tiền mặt khi nhận hàng" },
-  { value: "bank", label: "Chuyển khoản ngân hàng" },
+  { value: "bank", label: "Chuyển khoản ngân hàng", disabled: true },
 ];
 
-export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
+export function CheckoutPanel({ discountCode, customizations, onBack, onSuccess }: CheckoutPanelProps) {
   const { items, clear } = useCart();
   const { createOrder } = useStore();
   const { user, isAuthenticated } = useAuthModal();
@@ -72,12 +81,20 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
     setIsSubmitting(true);
 
     const order = await createOrder({
-      items: items.map((line) => ({
-        productId: line.product.id,
-        quantity: line.quantity,
-        color: line.color,
-        size: line.size,
-      })),
+      items: items.map((line) => {
+        const customization = customizations[cartLineKey(line.product.id, line.color, line.size)];
+        return {
+          productId: line.product.id,
+          customizationDetails: [
+            {
+              size: line.size,
+              quantity: line.quantity,
+              name: customization?.name.trim() || undefined,
+              jerseyNumber: customization?.jerseyNumber.trim() || undefined,
+            },
+          ],
+        };
+      }),
       paymentMethod: data.paymentMethod,
       address: data.address.trim(),
       discountCode,
@@ -104,9 +121,18 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
       className="mt-6 flex flex-col gap-4 border-t border-border pt-6"
       noValidate
     >
-      <h3 className="text-sm font-semibold uppercase tracking-label text-foreground">
-        Thông tin đặt hàng
-      </h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold uppercase tracking-label text-foreground">
+          Thông tin đặt hàng
+        </h3>
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-xs font-medium uppercase tracking-label text-muted underline-offset-4 hover:cursor-pointer hover:text-foreground hover:underline"
+        >
+          ← Quay lại
+        </button>
+      </div>
       <div>
         <input {...register("name")} placeholder="Họ và tên" className={INPUT_CLASS} />
         {errors.name ? <p className="mt-1 text-xs text-red-600">{errors.name.message}</p> : null}
@@ -149,19 +175,29 @@ export function CheckoutPanel({ discountCode, onSuccess }: CheckoutPanelProps) {
         <legend className="mb-1 text-xs font-medium uppercase tracking-label text-muted">
           Phương thức thanh toán
         </legend>
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col gap-4 sm:flex-row sm:gap-2">
           {PAYMENT_OPTIONS.map((option) => (
             <label
               key={option.value}
-              className="flex flex-1 cursor-pointer items-center gap-2 rounded-card border border-border px-3 py-2.5 text-sm text-foreground has-[:checked]:border-foreground has-[:checked]:bg-surface-strong"
+              className={`relative flex flex-1 items-center gap-2 rounded-card border border-border px-3 py-2.5 text-sm has-[:checked]:border-foreground has-[:checked]:bg-surface-strong ${
+                option.disabled
+                  ? "cursor-not-allowed text-muted"
+                  : "cursor-pointer text-foreground"
+              }`}
             >
               <input
                 type="radio"
                 value={option.value}
+                disabled={option.disabled}
                 {...register("paymentMethod")}
                 className="size-3.5"
               />
               {option.label}
+              {option.disabled ? (
+                <span className="absolute -top-2.5 right-0 rounded-full bg-gray-300 px-1.5 py-0.5 text-[0.65rem] font-medium uppercase tracking-label text-gray-600">
+                  Không khả dụng
+                </span>
+              ) : null}
             </label>
           ))}
         </div>

@@ -19,13 +19,13 @@ const API_ORDER: ApiOrder = {
   items: [
     {
       product: { _id: "product-1", name: "Set Concept Argentina" },
-      quantity: 2,
       unitPrice: 220_000,
-      color: "blue",
-      size: "M",
+      customizationDetails: [{ size: "M", quantity: 2 }],
     },
   ],
   status: "pending",
+  orderType: "single",
+  productDesignMode: "standard",
   totalAmount: 420_000,
   discount: 20_000,
   discountCode: "SUMMER10",
@@ -55,10 +55,8 @@ describe("mapApiOrderToOrder", () => {
           productId: "product-1",
           productName: "Set Concept Argentina",
           unitPrice: 220_000,
-          quantity: 2,
+          customizationDetails: [{ size: "M", quantity: 2 }],
           lineTotal: 440_000,
-          color: "blue",
-          size: "M",
         },
       ],
       subtotal: 440_000,
@@ -69,6 +67,8 @@ describe("mapApiOrderToOrder", () => {
       paymentMethod: "cash",
       isPaid: false,
       status: "pending",
+      orderType: "single",
+      productDesignMode: "standard",
       createdAt: "2026-01-01T00:00:00.000Z",
       note: "Leave at front desk",
     });
@@ -93,10 +93,8 @@ describe("mapApiOrderToOrder", () => {
       items: [
         {
           product: "product-2",
-          quantity: 1,
           unitPrice: 100_000,
-          color: "black",
-          size: "L",
+          customizationDetails: [{ size: "L", quantity: 1 }],
         },
       ],
     });
@@ -105,11 +103,27 @@ describe("mapApiOrderToOrder", () => {
       productId: "product-2",
       productName: "Sản phẩm",
       unitPrice: 100_000,
-      quantity: 1,
+      customizationDetails: [{ size: "L", quantity: 1 }],
       lineTotal: 100_000,
-      color: "black",
-      size: "L",
     });
+  });
+
+  it("sums quantities across multiple customization details for the line total", () => {
+    const order = mapApiOrderToOrder({
+      ...API_ORDER,
+      items: [
+        {
+          product: { _id: "product-1", name: "Set Concept Argentina" },
+          unitPrice: 100_000,
+          customizationDetails: [
+            { size: "M", name: "RONALDO", jerseyNumber: "7", quantity: 2 },
+            { size: "L", quantity: 3 },
+          ],
+        },
+      ],
+    });
+
+    expect(order.lines[0].lineTotal).toBe(500_000);
   });
 
   it("maps a line's isPreOrder flag", () => {
@@ -139,7 +153,7 @@ describe("createOrderApi", () => {
     });
 
     const result = await createOrderApi({
-      items: [{ productId: "product-1", quantity: 2, color: "blue", size: "M" }],
+      items: [{ productId: "product-1", customizationDetails: [{ size: "M", quantity: 2 }] }],
       paymentMethod: "cash",
       address: "123 Main St, Springfield",
     });
@@ -152,7 +166,7 @@ describe("createOrderApi", () => {
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(JSON.parse(init.body as string)).toEqual({
-      items: [{ productId: "product-1", quantity: 2, color: "blue", size: "M" }],
+      items: [{ productId: "product-1", customizationDetails: [{ size: "M", quantity: 2 }] }],
       paymentMethod: "cash",
       address: "123 Main St, Springfield",
     });
@@ -167,7 +181,7 @@ describe("createOrderApi", () => {
     });
 
     const result = await createOrderApi({
-      items: [{ productId: "product-1", quantity: 1, color: "blue", size: "M" }],
+      items: [{ productId: "product-1", customizationDetails: [{ size: "M", quantity: 1 }] }],
       paymentMethod: "cash",
       address: "123 Main St, Springfield",
     });

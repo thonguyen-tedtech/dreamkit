@@ -96,11 +96,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const updateOrderStatusAction = useCallback(
-    async (id: string, status: OrderStatus) => {
+    async (id: string, status: OrderStatus, trackingNumber?: string) => {
       if (!accessToken) {
         return;
       }
-      const result = await updateOrderApi(accessToken, id, { status });
+      const result = await updateOrderApi(accessToken, id, { status, trackingNumber });
       if (!result.ok) {
         showToast(result.message, "error");
         return;

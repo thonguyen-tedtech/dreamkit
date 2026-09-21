@@ -125,9 +125,25 @@ export interface CatalogueCollection {
 export type OrderStatus =
   | "pending"
   | "confirmed"
-  | "shipped"
+  | "in_production"
+  | "printing"
+  | "shipping"
   | "delivered"
   | "cancelled";
+
+/**
+ * Whether an order is for one person or a bulk/team order (mirrors the
+ * backend's OrderType enum).
+ */
+export type OrderType = "single" | "team";
+
+/**
+ * How the order's products were sourced (mirrors the backend's
+ * ProductDesignMode enum). Standard orders reference existing catalog
+ * products; Custom orders carry admin-uploaded design images and skip
+ * straight to production.
+ */
+export type ProductDesignMode = "standard" | "custom";
 
 /** How the customer pays for an order (mirrors the backend's PaymentMethod enum). */
 export type PaymentMethod = "bank" | "cash";
@@ -144,14 +160,25 @@ export interface AuthUser {
   readonly address?: string;
 }
 
+/** One size/name/number grouping within an order line, with its own quantity. */
+export interface OrderCustomizationDetail {
+  readonly size: string;
+  /** Name to print, if any. */
+  readonly name?: string;
+  /** Jersey number to print, if any. */
+  readonly jerseyNumber?: string;
+  readonly quantity: number;
+}
+
 export interface OrderLine {
   readonly productId: string;
   readonly productName: string;
+  /** Catalog product photo, when the referenced product is still populated. */
+  readonly productImage?: string;
   readonly unitPrice: number;
-  readonly quantity: number;
+  readonly customizationDetails: readonly OrderCustomizationDetail[];
+  /** Derived client-side: unitPrice × the sum of every detail's quantity. */
   readonly lineTotal: number;
-  readonly color: ColorKey;
-  readonly size: string;
   /** Whether this line was purchased as a pre-order, fixed at time of purchase. */
   readonly isPreOrder?: boolean;
 }
@@ -180,6 +207,22 @@ export interface Order {
   readonly paymentMethod: PaymentMethod;
   readonly isPaid: boolean;
   readonly status: OrderStatus;
+  /** Single-person vs. bulk/team order. */
+  readonly orderType: OrderType;
+  /** Standard catalog product vs. custom uploaded design. */
+  readonly productDesignMode: ProductDesignMode;
+  /** Links to the custom design images; present when productDesignMode is "custom". */
+  readonly customDesignImages?: readonly string[];
+  /** Shipping tracking number; set by the admin, required before the order can be marked delivered. */
+  readonly trackingNumber?: string;
+  /** Server-stamped timestamp of the moment an admin confirmed the order. Anchors the printing/packaging estimate. */
+  readonly confirmedAt?: string;
+  /** Server-stamped timestamp of the moment the order entered "in_production" (custom orders). */
+  readonly productionCompletedAt?: string;
+  /** Server-stamped timestamp of the moment the order entered "printing". */
+  readonly printingCompletedAt?: string;
+  /** Server-stamped timestamp of the moment the order entered "shipping". */
+  readonly shippingCompletedAt?: string;
   readonly createdAt: string;
   readonly note?: string;
 }

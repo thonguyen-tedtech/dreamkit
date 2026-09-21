@@ -13,7 +13,11 @@ export interface StoreContextValue {
   readonly refreshProducts: () => Promise<void>;
   readonly refreshOrders: () => Promise<void>;
   readonly createOrder: (input: CreateOrderInput) => Promise<Order | null>;
-  readonly updateOrderStatus: (id: string, status: OrderStatus) => Promise<void>;
+  readonly updateOrderStatus: (
+    id: string,
+    status: OrderStatus,
+    trackingNumber?: string,
+  ) => Promise<void>;
   readonly deleteOrder: (id: string) => Promise<void>;
 }
 

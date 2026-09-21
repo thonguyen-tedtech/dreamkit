@@ -4,7 +4,15 @@ import { type FormEvent, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from "@/lib/orders";
+import {
+  buildOrderTimeline,
+  ORDER_STATUS_LABELS,
+  ORDER_TYPE_LABELS,
+  PAYMENT_METHOD_LABELS,
+  PRODUCT_DESIGN_MODE_LABELS,
+  type OrderTimelineStep,
+  type TimelineStepState,
+} from "@/lib/orders";
 import { trackOrderByHashApi } from "@/lib/orders-api";
 import { formatPrice } from "@/lib/products";
 import type { Order } from "@/lib/types";
@@ -121,18 +129,38 @@ function OrderResult({ order }: OrderResultProps) {
         >
           {order.isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
         </span>
+        <span className="rounded-full bg-accent px-2 py-0.5 font-medium text-accent-foreground">
+          {ORDER_TYPE_LABELS[order.orderType]}
+        </span>
+        <span className="rounded-full bg-accent px-2 py-0.5 font-medium text-accent-foreground">
+          {PRODUCT_DESIGN_MODE_LABELS[order.productDesignMode]}
+        </span>
       </div>
+
+      {order.status === "cancelled" ? (
+        <p className="mt-6 rounded-card border border-dashed border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+          Đơn hàng này đã bị huỷ.
+        </p>
+      ) : (
+        <OrderTimelineView order={order} />
+      )}
 
       <ul className="mt-6 border-t border-border pt-4 text-sm">
         {order.lines.map((line, index) => (
-          <li
-            key={`${order.id}-${line.productId}-${index}`}
-            className="flex items-center justify-between gap-4 py-2"
-          >
-            <span className="text-foreground">
-              {line.productName} ({line.color} · {line.size}) × {line.quantity}
-            </span>
-            <span className="text-muted">{formatPrice(line.lineTotal)}</span>
+          <li key={`${order.id}-${line.productId}-${index}`} className="py-2">
+            <div className="flex items-center justify-between gap-4">
+              <span className="font-medium text-foreground">{line.productName}</span>
+              <span className="text-muted">{formatPrice(line.lineTotal)}</span>
+            </div>
+            <ul className="mt-1 flex flex-col gap-0.5 pl-3 text-xs text-muted">
+              {line.customizationDetails.map((detail, detailIndex) => (
+                <li key={detailIndex}>
+                  Size {detail.size}
+                  {detail.name ? ` · ${detail.name}` : ""}
+                  {detail.jerseyNumber ? ` · Số ${detail.jerseyNumber}` : ""} × {detail.quantity}
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ul>
@@ -142,8 +170,93 @@ function OrderResult({ order }: OrderResultProps) {
       ) : null}
 
       {order.note ? (
-        <p className="mt-1 text-sm text-muted">Ghi chú: {order.note}</p>
+        <p className="mt-1 whitespace-pre-line text-sm text-muted">Ghi chú: {order.note}</p>
       ) : null}
     </article>
+  );
+}
+
+const STEP_STATE_STYLES: Readonly<Record<TimelineStepState, { dot: string; line: string; title: string }>> = {
+  done: {
+    dot: "border-emerald-600 bg-emerald-600 text-white",
+    line: "bg-emerald-600",
+    title: "text-foreground",
+  },
+  active: {
+    dot: "border-foreground bg-foreground text-background",
+    line: "bg-border",
+    title: "text-foreground",
+  },
+  upcoming: {
+    dot: "border-border bg-surface text-muted",
+    line: "bg-border",
+    title: "text-muted",
+  },
+};
+
+interface OrderTimelineViewProps {
+  readonly order: Order;
+}
+
+function OrderTimelineView({ order }: OrderTimelineViewProps) {
+  const steps = buildOrderTimeline(order);
+
+  return (
+    <ol className="mt-6 flex flex-col gap-0 border-t border-border pt-6">
+      {steps.map((step, index) => (
+        <TimelineStepRow
+          key={step.key}
+          step={step}
+          isLast={index === steps.length - 1}
+        />
+      ))}
+    </ol>
+  );
+}
+
+interface TimelineStepRowProps {
+  readonly step: OrderTimelineStep;
+  readonly isLast: boolean;
+}
+
+function TimelineStepRow({ step, isLast }: TimelineStepRowProps) {
+  const styles = STEP_STATE_STYLES[step.state];
+
+  return (
+    <li className="flex gap-4">
+      <div className="flex flex-col items-center">
+        <span
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold ${styles.dot}`}
+        >
+          {step.state === "done" ? "✓" : ""}
+        </span>
+        {!isLast ? <span className={`w-px flex-1 ${styles.line}`} /> : null}
+      </div>
+      <div className={`flex flex-col gap-1 ${isLast ? "pb-0" : "pb-6"}`}>
+        <p className={`text-sm font-semibold ${styles.title}`}>{step.title}</p>
+        <p className="text-xs text-muted">{step.detail}</p>
+        {step.estimateLabel ? (
+          <p className="text-xs text-muted">Dự kiến: {step.estimateLabel}</p>
+        ) : null}
+        {step.images && step.images.length > 0 ? (
+          <div className="mt-1 flex flex-wrap gap-2">
+            {step.images.map((image, index) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={`${image}-${index}`}
+                src={image}
+                alt="Ảnh thiết kế cuối cùng"
+                className="h-24 w-24 rounded-card border border-border object-cover"
+              />
+            ))}
+          </div>
+        ) : null}
+        {step.trackingNumber ? (
+          <p className="text-xs font-medium text-foreground">
+            Mã vận đơn: {step.trackingNumber}
+          </p>
+        ) : null}
+      </div>
+    </li>
   );
 }

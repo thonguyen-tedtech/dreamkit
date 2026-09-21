@@ -13,6 +13,7 @@ import { COLOR_META, formatPrice } from "@/lib/products";
 import { cn } from "@/lib/cn";
 import type { CartDetailLine } from "@/lib/cart";
 import { CheckoutPanel } from "./checkout-panel";
+import { CustomizationStep, type LineCustomization } from "./customization-step";
 import { useCart } from "./cart-context";
 
 const LINK_BUTTON_CLASS =
@@ -36,7 +37,8 @@ export function CartView() {
   const { showToast } = useToast();
   const { isAuthenticated } = useAuthModal();
   const [orderHash, setOrderHash] = useState<string | null>(null);
-  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<"idle" | "customize" | "payment">("idle");
+  const [customizations, setCustomizations] = useState<Record<string, LineCustomization>>({});
   const [discountInput, setDiscountInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(null);
   const [isApplyingDiscount, setIsApplyingDiscount] = useState(false);
@@ -73,6 +75,13 @@ export function CartView() {
   function handleRemoveDiscount() {
     setAppliedDiscount(null);
     setDiscountInput("");
+  }
+
+  function handleCustomizationChange(key: string, patch: Partial<LineCustomization>) {
+    setCustomizations((current) => {
+      const existing = current[key] ?? { name: "", jerseyNumber: "" };
+      return { ...current, [key]: { ...existing, ...patch } };
+    });
   }
 
   if (orderHash) {
@@ -222,13 +231,26 @@ export function CartView() {
         <Button
           size="lg"
           className="mt-6 w-full"
-          onClick={() => setShowCheckout((open) => !open)}
+          onClick={() =>
+            setCheckoutStep((step) => (step === "idle" ? "customize" : "idle"))
+          }
         >
-          {showCheckout ? "Ẩn form đặt hàng" : "Tiến hành thanh toán"}
+          {checkoutStep === "idle" ? "Tiến hành thanh toán" : "Ẩn form đặt hàng"}
         </Button>
-        {showCheckout ? (
+        {checkoutStep === "customize" ? (
+          <CustomizationStep
+            items={items}
+            customizations={customizations}
+            onChange={handleCustomizationChange}
+            onBack={() => setCheckoutStep("idle")}
+            onContinue={() => setCheckoutStep("payment")}
+          />
+        ) : null}
+        {checkoutStep === "payment" ? (
           <CheckoutPanel
             discountCode={appliedDiscount?.code}
+            customizations={customizations}
+            onBack={() => setCheckoutStep("customize")}
             onSuccess={(hash) => setOrderHash(hash)}
           />
         ) : null}

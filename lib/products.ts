@@ -297,8 +297,6 @@ export const FEATURED_STORY: FeaturedStory = {
     "Chiếc áo là câu chuyện về những con người sống ở TP. Hồ Chí Minh hoa lệ, đến với nhau bằng tình yêu bóng đá sau một ngày tất bật với công việc — hướng đến hành trình bảo vệ danh hiệu Ultimate.",
   image: "/images/z7004268926018_7106951106858b4aa62b4753c704e19f-1536x863.jpg",
   palette: [
-    { label: "Primary", hex: "#16130f" },
-    { label: "Secondary", hex: "#b07d4b" },
   ],
 };
 

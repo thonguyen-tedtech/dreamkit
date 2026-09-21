@@ -69,9 +69,7 @@ export default function PreOrderForm({ product, isOpen, onClose }: PreOrderFormP
       items: [
         {
           productId: product.id,
-          quantity,
-          color: selectedColor,
-          size: selectedSize,
+          customizationDetails: [{ size: selectedSize, quantity }],
         },
       ],
       paymentMethod: "cash",

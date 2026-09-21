@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { useAuthModal } from "@/components/auth/auth-modal-context";
 import { useCart } from "@/components/cart/cart-context";
@@ -17,13 +18,19 @@ const NAV_LINKS: readonly NavLink[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Cửa hàng", href: "/shop" },
   { label: "Catalogue", href: "/catalogue" },
-  { label: "Portfolio", href: "/portfolio" },
+  { label: "Tra cứu đơn hàng", href: "/track-order" },
 ];
+
+function isActiveLink(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { open: openAuth, isAuthenticated, isAdmin } = useAuthModal();
   const { count } = useCart();
+  const pathname = usePathname();
 
   return (
     <header
@@ -48,27 +55,34 @@ export function SiteHeader() {
 
         <nav aria-label="Điều hướng chính" className="hidden md:block">
           <ul className="flex items-center gap-9">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-xs font-medium uppercase tracking-label text-foreground/80 transition-colors hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = isActiveLink(pathname, link.href);
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
+                      "relative pb-1 text-xs font-medium uppercase tracking-label transition-colors hover:text-foreground",
+                      isActive ? "text-foreground" : "text-foreground/80",
+                    )}
+                  >
+                    {link.label}
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "absolute inset-x-0 -bottom-0.5 h-0.5 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-out",
+                        isActive && "scale-x-100",
+                      )}
+                    />
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="flex items-center gap-4">
-          <button
-            type="button"
-            aria-label="Tìm kiếm"
-            className="text-foreground/80 transition-colors hover:cursor-pointer hover:text-foreground"
-          >
-            <SearchIcon />
-          </button>
           <Link
             href="/cart"
             aria-label={count > 0 ? `Giỏ hàng, ${count} sản phẩm` : "Giỏ hàng"}
@@ -122,17 +136,24 @@ export function SiteHeader() {
         )}
       >
         <ul className="flex flex-col gap-1 px-6 py-3">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={() => setIsMenuOpen(false)}
-                className="block py-2 text-sm font-medium uppercase tracking-label text-foreground/80 hover:text-foreground"
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const isActive = isActiveLink(pathname, link.href);
+            return (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "-ml-3 block border-l-2 border-transparent py-2 pl-3 text-sm font-medium uppercase tracking-label hover:text-foreground",
+                    isActive ? "border-accent text-foreground" : "text-foreground/80",
+                  )}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            );
+          })}
           {!isAuthenticated ? (
             <li>
               <button
@@ -173,15 +194,6 @@ export function SiteHeader() {
         </ul>
       </nav>
     </header>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.6" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
   );
 }
 

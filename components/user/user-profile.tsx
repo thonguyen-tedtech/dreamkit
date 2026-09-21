@@ -99,14 +99,21 @@ export function UserProfile() {
 
                 <ul className="mt-4 border-t border-border pt-4 text-sm">
                   {order.lines.map((line, index) => (
-                    <li
-                      key={`${order.id}-${line.productId}-${index}`}
-                      className="flex items-center justify-between gap-4 py-2"
-                    >
-                      <span className="text-foreground">
-                        {line.productName} ({line.color} · {line.size}) × {line.quantity}
-                      </span>
-                      <span className="text-muted">{formatPrice(line.lineTotal)}</span>
+                    <li key={`${order.id}-${line.productId}-${index}`} className="py-2">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-foreground">{line.productName}</span>
+                        <span className="text-muted">{formatPrice(line.lineTotal)}</span>
+                      </div>
+                      <ul className="mt-1 flex flex-col gap-0.5 pl-3 text-xs text-muted">
+                        {line.customizationDetails.map((detail, detailIndex) => (
+                          <li key={detailIndex}>
+                            Size {detail.size}
+                            {detail.name ? ` · ${detail.name}` : ""}
+                            {detail.jerseyNumber ? ` · Số ${detail.jerseyNumber}` : ""} ×{" "}
+                            {detail.quantity}
+                          </li>
+                        ))}
+                      </ul>
                     </li>
                   ))}
                 </ul>
